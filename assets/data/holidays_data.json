@@ -1,0 +1,17 @@
+
+{
+
+  "holidays": [
+    { "name": "Chuseok (US/ROK)", "Year":2025, "Month": 10, "Date": 6 },
+    { "name": "Columbus Day (US) Training Holiday", "Year":2025, "Month": 10, "Date": 10 },
+    { "name": "Columbus Day (US)", "Year":2025, "Month": 10, "Date": 13 },
+    { "name": "Veteran's Day (US) Training Holiday", "Year":2025, "Month": 11, "Date": 10 },
+    { "name": "Veteran's Day 2025", "Year":2025, "Month": 11, "Date": 11 },
+    { "name": "Thanksgiving Day (US)", "Year":2025, "Month": 11, "Date": 27 },
+    { "name": "Thanksgiving Day (US) Training Holiday", "Year":2025, "Month": 11, "Date": 28 },
+    { "name": "Christmas Day (US)", "Year":2025, "Month": 12, "Date": 25 },
+    { "name": "Christmas Day (US) Training Holiday", "Year":2025, "Month": 12, "Date": 26 },
+    { "name": "New Year's Day (US/ROK)", "Year":2025, "Month": 12, "Date": 31 }
+  ]
+
+}
