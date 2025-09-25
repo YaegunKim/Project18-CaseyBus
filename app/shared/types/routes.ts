@@ -10,13 +10,6 @@ export interface Stop {
   revisit?: boolean;       // 선택적
 }
 
-// 📌 경로 Path 좌표
-export interface PathPoint {
-  index: number;
-  x: number;
-  y: number;
-  t: number; // 시간 or index
-}
 
 // 📌 노선(Route)
 export interface Route {
@@ -26,7 +19,6 @@ export interface Route {
   totalMinutes: number;
   highlighted: boolean;
   stops: Stop[];
-  path: PathPoint[];
   schedule_weekdays: string[]; // "HH:MM" 포맷
   schedule_holidays: string[];
 }

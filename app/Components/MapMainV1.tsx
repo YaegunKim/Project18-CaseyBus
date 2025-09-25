@@ -2,16 +2,14 @@ import { FontAwesome6 } from '@expo/vector-icons';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, PanResponder, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Shadow } from 'react-native-shadow-2';
-import Svg, { Circle, G, Line, Polyline, Text } from 'react-native-svg';
+import Svg, { Circle, G, Line, Path, Polyline, Text } from 'react-native-svg';
 import routes_data from '../../assets/data/routes_data.json';
 import { trackBus } from '../shared/busTrackUtils';
-import { Stop } from '../shared/types/routes';
+import { Route, Stop } from '../shared/types/routes';
 
 const VIEW_W = Dimensions.get('window').width;
 const VIEW_H = Dimensions.get('window').height;
 const [routeTMC, routeH221, routeHovey] = routes_data.routes;
-
-
 
 
 
@@ -69,12 +67,6 @@ export default function MapMain() {
       onPanResponderRelease: () => {
         if (Date.now() - tapStartRef.current.t < 100) {
           toggleSheet('');
-
-
-          const newTime =  new Date("2025-09-22 "+"05:00");
-          
-          console.log("newTime: " + newTime);
-          console.log("TMC: " + trackBus());
         
         }
       }
@@ -85,11 +77,6 @@ export default function MapMain() {
   const stationDetail_H = VIEW_H / 4;
   const stationDetail_offsetY = useRef(new Animated.Value(stationDetail_H)).current;
   const isStationDetailOpened = useRef(false);
-
-  //station pin
-  const pinTMC = false;
-  const pinH221 = false;
-  const pinHovey = false;
 
 
   const toggleSheet = React.useCallback((nextHighlight: '' | 'TMC' | 'H221' | 'Hovey') => {
@@ -107,7 +94,16 @@ export default function MapMain() {
     });
   }, [stationDetail_offsetY, stationDetail_H]);
   
+  // const [runningBuses, setRunnigBuses] = useState(trackBus());
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setTick(t => t + 1), 1000); // 1초마다
+    return () => clearInterval(id);
+  }, []);
 
+  const runningBuses = React.useMemo(() => {
+    return trackBus(new Date()); // or trackBus(Date.now()) 처럼 필요 파라미터 전달
+  }, [tick /*, highlightedRoute 등 필요할 때만 추가 */]);
 
 
   return (
@@ -312,6 +308,21 @@ export default function MapMain() {
                     </Text>
                     ) 
                   })}
+                    {runningBuses.map((item:[Route,number[]], index) => {
+                    return(
+                      <G x={item[1][0]-10} y={item[1][1]-10} scale={20 / 576}>
+                        <Path d="M192 64C139 64 96 107 96 160L96 448C96 477.8 116.4 502.9 144 510L144 544C144 561.7 158.3 576 176 576L192 576C209.7 576 224 561.7 224 544L224 512L416 512L416 544C416 561.7 430.3 576 448 576L464 576C481.7 576 496 561.7 496 544L496 510C523.6 502.9 544 477.8 544 448L544 160C544 107 501 64 448 64L192 64zM160 240C160 222.3 174.3 208 192 208L296 208L296 320L192 320C174.3 320 160 305.7 160 288L160 240zM344 320L344 208L448 208C465.7 208 480 222.3 480 240L480 288C480 305.7 465.7 320 448 320L344 320zM192 384C209.7 384 224 398.3 224 416C224 433.7 209.7 448 192 448C174.3 448 160 433.7 160 416C160 398.3 174.3 384 192 384zM448 384C465.7 384 480 398.3 480 416C480 433.7 465.7 448 448 448C430.3 448 416 433.7 416 416C416 398.3 430.3 384 448 384zM248 136C248 122.7 258.7 112 272 112L368 112C381.3 112 392 122.7 392 136C392 149.3 381.3 160 368 160L272 160C258.7 160 248 149.3 248 136z"
+                          fill={item[0] == routeTMC?"#0345fc":(item[0] == routeH221?"#009623": "#ff2a00")}
+                        />
+                        <Path d="M192 64C139 64 96 107 96 160L96 448C96 477.8 116.4 502.9 144 510L144 544C144 561.7 158.3 576 176 576L192 576C209.7 576 224 561.7 224 544L224 512L416 512L416 544C416 561.7 430.3 576 448 576L464 576C481.7 576 496 561.7 496 544L496 510C523.6 502.9 544 477.8 544 448L544 160C544 107 501 64 448 64L192 64zM160 240C160 222.3 174.3 208 192 208L296 208L296 320L192 320C174.3 320 160 305.7 160 288L160 240zM344 320L344 208L448 208C465.7 208 480 222.3 480 240L480 288C480 305.7 465.7 320 448 320L344 320zM192 384C209.7 384 224 398.3 224 416C224 433.7 209.7 448 192 448C174.3 448 160 433.7 160 416C160 398.3 174.3 384 192 384zM448 384C465.7 384 480 398.3 480 416C480 433.7 465.7 448 448 448C430.3 448 416 433.7 416 416C416 398.3 430.3 384 448 384zM248 136C248 122.7 258.7 112 272 112L368 112C381.3 112 392 122.7 392 136C392 149.3 381.3 160 368 160L272 160C258.7 160 248 149.3 248 136z"
+                          fill={item[0] == routeTMC?"#0345fc":(item[0] == routeH221?"#009623": "#ff2a00")}
+                          stroke="#ffffffff"
+                          strokeWidth={30}
+                        />
+                      </G>
+                      
+                    )
+                  })}
 
             
           </Svg>
@@ -331,6 +342,7 @@ export default function MapMain() {
             <FontAwesome6 name="arrow-rotate-right" size={20} color="#fff" />
           </TouchableOpacity>
         </Animated.View>
+          
         {/* <View style={[styles.buttonBox, styles.openBox]}>
           <TouchableOpacity style={styles.buttons} onPress={() => {toggleSheet('')}} >
             <FontAwesome6 name="arrow-rotate-right" size={20} color="#fff" />
@@ -401,6 +413,10 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     // Android shadow
     // elevation: 30,
+  },
+  bus: {
+    position: 'absolute',
+    display: 'flex',
   }
 
 });
