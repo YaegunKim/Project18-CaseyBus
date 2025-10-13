@@ -1,8 +1,8 @@
 import { FontAwesome6 } from '@expo/vector-icons';
-import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, PanResponder, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Animated, Dimensions, NativeTouchEvent, PanResponder, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Shadow } from 'react-native-shadow-2';
-import Svg, { Circle, G, Line, Path, Polyline, Text } from 'react-native-svg';
+import Svg, { Circle, G, Line, Path, Polyline, Text as SvgText } from 'react-native-svg';
 import routes_data from '../../assets/data/routes_data.json';
 import { trackBus } from '../shared/busTrackUtils';
 import { Route, Stop } from '../shared/types/routes';
@@ -12,41 +12,52 @@ const VIEW_H = Dimensions.get('window').height;
 const [routeTMC, routeH221, routeHovey] = routes_data.routes;
 
 
+function getDistance(touches: NativeTouchEvent[]){
+  const [touch1 , touch2] = touches;
+  return Math.sqrt((touch1.locationX-touch2.locationX)**2+(touch1.locationY-touch2.locationY));
+}
+
+function getCenterLocationX(touches: NativeTouchEvent[]){
+  const [touch1 , touch2] = touches;
+  return (touch1.locationX+touch2.locationX)/2
+}
+function getCenterLocationY(touches: NativeTouchEvent[]){
+  const [touch1 , touch2] = touches;
+  return (touch1.locationY+touch2.locationY)/2
+}
 
 
 export default function MapMain() {
 
-  const [highlightedRoute, setHighlightedRoute] = useState('');
+  const [highlightedRoute, setHighlightedRoute] = useState<string>('');
+  const [selectedStation, setSelectedStation] = useState<Stop | null>(null);
 
-  function highlightRoutes() {
-    if(highlightedRoute == 'TMC') {routeTMC.highlighted = true;
-    }else{routeTMC.highlighted = false;}
-    if(highlightedRoute == 'H221') {routeH221.highlighted = true;
-    }else{routeH221.highlighted = false;}
-    if(highlightedRoute == 'Hovey') {routeHovey.highlighted = true;
-    }else{routeHovey.highlighted = false;}
-  }
-  highlightRoutes();
+  const highlightRoutes = useCallback(() => {
+    routeTMC.highlighted = highlightedRoute === 'TMC';
+    routeH221.highlighted = highlightedRoute === 'H221';
+    routeHovey.highlighted = highlightedRoute === 'Hovey';
+  }, [highlightedRoute]);
 
+  // ensure highlights sync when state changes
+  useEffect(() => {
+    highlightRoutes();
+  }, [highlightRoutes]);
 
   // Pan을 위한 state/ref
-  const [vx, setVx] = useState(0); // viewBox x 좌단
-  const [vy, setVy] = useState(200); // viewBox y 상단
-  const [vw, setVw] = useState(VIEW_W); // viewBox width
-  const [vh, setVh] = useState(VIEW_H); // viewBox height
-  const vxRef = useRef(0);
-  const vyRef = useRef(0);
-  const vwRef = useRef(0);
-  const vhRef = useRef(0);
+  const [{vx,vy,vw,vh}, setVB] = useState({ vx: 0, vy: 200, vw: VIEW_W, vh: VIEW_H });
+  const vbRef = useRef({ vx:0, vy:200, vw:VIEW_W, vh:VIEW_H });
   const startRef = useRef({ vx: 0, vy: 0, vw: VIEW_W, vh: VIEW_H});
   const tapStartRef = useRef({ t: 0 });
   
+  let initialDistance = 0;
+  let initialCenterPinchX = 0;
+  let initialCenterPinchY = 0;
+  let initialVx = 0;
+  let initialVy = 0;
+
 
   //렌더가 시작했을 때, vx,vy가 각각 바꼈으면 ref 업데이트
-  useEffect(() => { vxRef.current = vx; }, [vx]);
-  useEffect(() => { vyRef.current = vy; }, [vy]);
-  useEffect(() => { vwRef.current = vw; }, [vw]);
-  useEffect(() => { vhRef.current = vh; }, [vh]);
+  useEffect(() => { vbRef.current = {vx,vy,vw,vh}; }, [vx,vy,vw,vh]);
  
 
   
@@ -54,19 +65,51 @@ export default function MapMain() {
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onPanResponderGrant: (_e, g) => {
-        startRef.current = { vx: vxRef.current, vy: vyRef.current, vw:vwRef.current, vh:vhRef.current };
+        startRef.current = { ...vbRef.current };
         tapStartRef.current = { t:Date.now() };
+        initialDistance = 0;
       },
       onPanResponderMove: (_e, g) => {
-          const currentScale = vwRef.current/VIEW_W;
+        if(g.numberActiveTouches == 1){
+          initialDistance = 0;
+          const currentScale = vbRef.current.vw/VIEW_W;
           const nextX = startRef.current.vx - g.dx*currentScale;
           const nextY = startRef.current.vy - g.dy*currentScale;
-          setVx(nextX);
-          setVy(nextY);
+          setVB(v => ({...v, vx: nextX, vy: nextY}));
+        } else if (g.numberActiveTouches == 2) {
+          if (initialDistance !== 0) {
+            const dist = getDistance((_e.nativeEvent as any).touches);
+            const factor = dist / initialDistance;
+            if (!isFinite(factor) || factor <= 0) return;
+
+            // 새 viewBox 크기
+            const nextVw = startRef.current.vw / factor;
+            const nextVh = startRef.current.vh / factor;
+
+            // 스케일
+            const s0 = startRef.current.vw / VIEW_W;
+            const s1 = nextVw / VIEW_W;
+
+            // 핀치 시작 시 중심의 월드 좌표 고정
+            const worldFx = initialVx + initialCenterPinchX * s0;
+            const worldFy = initialVy + initialCenterPinchY * s0;
+
+            const nextVx = worldFx - initialCenterPinchX * s1;
+            const nextVy = worldFy - initialCenterPinchY * s1;
+
+            setVB(v => ({...v, vw: nextVw, vh: nextVh, vx: nextVx, vy: nextVy}));
+          } else {
+            initialDistance      = getDistance((_e.nativeEvent as any).touches);
+            initialCenterPinchX  = getCenterLocationX((_e.nativeEvent as any).touches);
+            initialCenterPinchY  = getCenterLocationY((_e.nativeEvent as any).touches);
+            initialVx = startRef.current.vx;
+            initialVy = startRef.current.vy;
+          }
+        }
       },
       onPanResponderRelease: () => {
-        if (Date.now() - tapStartRef.current.t < 100) {
-          toggleSheet('');
+        if (Date.now() - tapStartRef.current.t < 300) {
+          toggleSheet(null);
         
         }
       }
@@ -79,20 +122,22 @@ export default function MapMain() {
   const isStationDetailOpened = useRef(false);
 
 
-  const toggleSheet = React.useCallback((nextHighlight: '' | 'TMC' | 'H221' | 'Hovey') => {
-    const openWindow = ['TMC', 'H221', 'Hovey'].includes(nextHighlight);
-    setHighlightedRoute(nextHighlight);
-    isStationDetailOpened.current = openWindow;
+  const toggleSheet = useCallback(
+    (station: Stop | null) => {
+      const openWindow = station !== null;
+      setSelectedStation(station);
+      isStationDetailOpened.current = openWindow;
 
-    Animated.spring(stationDetail_offsetY, {
-      toValue: openWindow ? 0 : stationDetail_H,
-      useNativeDriver: true,
-      damping: 100,
-      stiffness: 180,
-      mass: 0.8,
-    }).start(() => {
-    });
-  }, [stationDetail_offsetY, stationDetail_H]);
+      Animated.spring(stationDetail_offsetY, {
+        toValue: openWindow ? 0 : stationDetail_H,
+        useNativeDriver: true,
+        damping: 100,
+        stiffness: 180,
+        mass: 0.8,
+      }).start();
+    },
+    [stationDetail_offsetY, stationDetail_H]
+  );
   
   // const [runningBuses, setRunnigBuses] = useState(trackBus());
   const [tick, setTick] = useState(0);
@@ -104,6 +149,11 @@ export default function MapMain() {
   const runningBuses = React.useMemo(() => {
     return trackBus(new Date()); // or trackBus(Date.now()) 처럼 필요 파라미터 전달
   }, [tick /*, highlightedRoute 등 필요할 때만 추가 */]);
+
+  function getStationHours(s: Stop | null) {
+    if (!s) return null;
+    return (s.openingHours || s.opening_hours || s.hours || s.opening || null);
+  }
 
 
   return (
@@ -204,7 +254,7 @@ export default function MapMain() {
 
                   {routeHovey.stops.map((station:Stop, index) => {
                     return(
-                      <>
+                      <G key={`hovey-${index}`}>
                         <Circle cx={station.x}  cy={station.y}
                                 r={(station.intersaction3 || station.intersaction2)? 3 : 1.5}
                                 fill={
@@ -218,14 +268,14 @@ export default function MapMain() {
                                 r={20}
                                 fill='black'
                                 opacity={0}
-                                onPress={() => {toggleSheet("Hovey")}}/>
-                      </>
+                                onPress={() => {toggleSheet(station)}}/>
+                      </G>
 
                     ) // return
                   })}
                   {routeH221.stops.map((station:Stop, index) => {
                     return(
-                      <>
+                      <G key={`h221-${index}`}>
                         <Circle cx={station.x}  cy={station.y}
                                 r={(station.intersaction3 || station.intersaction2)? 3 : 1.5}
                                 fill={
@@ -239,15 +289,15 @@ export default function MapMain() {
                                 r={20}
                                 fill='black'
                                 opacity={0}
-                                onPress={() => {toggleSheet("H221")}}/>
-                      </>
+                                onPress={() => {toggleSheet(station)}}/>
+                      </G>
 
                       ) // return
                   })}
                   
                   {routeTMC.stops.map((station, index) => {
                     return(
-                      <>
+                      <G key={`tmc-${index}`}>
                         <Circle cx={station.x}  cy={station.y}
                                 r={station.intersaction3? 3 : 1.5}
                                 fill={station.intersaction3? (routeH221.highlighted || routeHovey.highlighted? "#0345fc50" : "#0345fc") : "white"}
@@ -256,8 +306,8 @@ export default function MapMain() {
                                 r={20}
                                 fill='black'
                                 opacity={0}
-                                onPress={() => {toggleSheet("TMC")}}/>
-                      </>
+                                onPress={() => {toggleSheet(station)}}/>
+                      </G>
                     ) // return
                   })}
 
@@ -268,13 +318,14 @@ export default function MapMain() {
                     if(station.revisit) return null;
                     if(station.intersaction3 && (routeH221.highlighted || routeHovey.highlighted)) return null;
                     return (
-                      <Text 
+                      <SvgText
+                      key={`tmc-text-${index}`}
                       x={station.x + 10} y={station.y}
                       fontSize={8}
                       fontWeight={routeTMC.highlighted? 600 : routeH221.highlighted || routeHovey.highlighted? 200 : 400}
                       transform={`rotate(-40, ${station.x}, ${station.y})`}>
                         {station.name}
-                    </Text>
+                    </SvgText>
                     ) 
                   })}
 
@@ -284,13 +335,14 @@ export default function MapMain() {
                     if(station.intersaction3 && !routeH221.highlighted) return null;
                     if(station.intersaction2 && routeHovey.highlighted) return null;
                     return (
-                      <Text 
+                      <SvgText 
+                      key={`h221-text-${index}`}
                       x={station.x + 10} y={station.y}
                       fontSize={8}
                       fontWeight={routeH221.highlighted? 600 : routeTMC.highlighted || routeHovey.highlighted? 200 : 400}
                       transform={`rotate(-40, ${routeH221.highlighted && station.intersaction3? station.x+5 : station.x}, ${routeH221.highlighted && station.intersaction3 ? station.y-5 : station.y})`}>
                         {station.name}
-                    </Text>
+                    </SvgText>
                     ) 
                   })}
 
@@ -299,13 +351,14 @@ export default function MapMain() {
                     if(station.intersaction3 && !routeHovey.highlighted) return null;
                     if(station.intersaction2 && !routeHovey.highlighted) return null;
                     return (
-                      <Text 
+                      <SvgText
+                      key={`hovey-text-${index}`}
                       x={station.x + 10} y={station.y}
                       fontSize={8}
                       fontWeight={routeHovey.highlighted? 600 : routeTMC.highlighted || routeH221.highlighted? 200 : 400}
                       transform={`rotate(-40, ${routeHovey.highlighted && (station.intersaction3 || station.intersaction2)? station.x+5 : station.x}, ${routeHovey.highlighted && (station.intersaction3 || station.intersaction2) ? station.y-5 : station.y})`}>
                         {station.name}
-                    </Text>
+                    </SvgText>
                     ) 
                   })}
                     {runningBuses.map((item:[Route,number[]], index) => {
@@ -328,21 +381,21 @@ export default function MapMain() {
           </Svg>
         </Animated.View>
         <Animated.View style={[styles.buttonBox, {transform: [{ translateY: Animated.add(stationDetail_offsetY, 380) }]}]}>
-          <TouchableOpacity style={styles.buttons} onPress={() => {setVx(vx+0.1*vw);setVy(vy+0.1*vh);setVw(vw/1.25);setVh(vh/1.25);} } >
+          <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: vw/1.25, vh: vh/1.25, vx: vx+0.1*vw, vy: vy+0.1*vh}));} } >
             <FontAwesome6 name="plus" size={20} color="#fff" />
           </TouchableOpacity>
         </Animated.View>
         <Animated.View style={[styles.buttonBox, {transform: [{ translateY: Animated.add(stationDetail_offsetY, 425) }]}]}>
-          <TouchableOpacity style={styles.buttons} onPress={() => {setVx(vx-0.125*vw);setVy(vy-0.125*vh);setVw(vw/0.8);setVh(vh/0.8)} } >
+          <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: vw/0.8, vh: vh/0.8, vx: vx-0.125*vw, vy: vy-0.125*vh}));} } >
             <FontAwesome6 name="minus" size={20} color="#fff" />
           </TouchableOpacity>
         </Animated.View>
         <Animated.View style={[styles.buttonBox, {transform: [{ translateY: Animated.add(stationDetail_offsetY, 470) }]}]}>
-          <TouchableOpacity style={styles.buttons} onPress={() => {setVx(0);setVy(200);setVw(VIEW_W);setVh(VIEW_H);} } >
+          <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: VIEW_W, vh: VIEW_H, vx: 0, vy: 200}));} } >
             <FontAwesome6 name="arrow-rotate-right" size={20} color="#fff" />
           </TouchableOpacity>
         </Animated.View>
-          
+
         {/* <View style={[styles.buttonBox, styles.openBox]}>
           <TouchableOpacity style={styles.buttons} onPress={() => {toggleSheet('')}} >
             <FontAwesome6 name="arrow-rotate-right" size={20} color="#fff" />
@@ -357,7 +410,31 @@ export default function MapMain() {
         distance={35}
         offset={[0,-4]}
         >
-          <View style={styles.stationDetail} />
+          <View style={styles.stationDetail}>
+            <View style={styles.stationDetailContent}>
+              {selectedStation ? (
+                <>
+                  <Text style={styles.stationTitle}>{selectedStation.name}</Text>
+                  <Text style={styles.stationSubtitle}>
+                    {selectedStation.description ?? ''}
+                  </Text>
+                  <Text style={styles.stationHours}>
+                    {getStationHours(selectedStation) ? `Opening: ${getStationHours(selectedStation)}` : 'Hours: not available'}
+                  </Text>
+
+                  <View style={{ marginTop: 12, flexDirection: 'row' }}>
+                    <TouchableOpacity onPress={() => toggleSheet(null)} style={[styles.buttons, { backgroundColor: '#333', marginRight: 12 }]}>
+                      <Text style={{ color: '#fff' }}>Close</Text>
+                    </TouchableOpacity>
+                  </View>
+                </>
+              ) : (
+                <View style={{ padding: 12 }}>
+                  <Text style={{ fontSize: 16, fontWeight: '600' }}>No station selected</Text>
+                </View>
+              )}
+            </View>
+          </View>
           </Shadow>
           </Animated.View>
     </>
@@ -413,6 +490,22 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     // Android shadow
     // elevation: 30,
+  },
+  stationDetailContent: {
+    padding: 16,
+  },
+  stationTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  stationSubtitle: {
+    marginTop: 6,
+    color: '#444',
+  },
+  stationHours: {
+    marginTop: 8,
+    fontSize: 14,
+    color: '#111',
   },
   bus: {
     position: 'absolute',

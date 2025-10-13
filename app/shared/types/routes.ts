@@ -8,6 +8,12 @@ export interface Stop {
   intersaction2?: boolean; // 선택적
   intersaction3?: boolean; // 선택적
   revisit?: boolean;       // 선택적
+  description?: string; // 선택적
+  
+  openingHours?: string;
+  opening_hours?: string;
+  hours?: string;
+  opening?: string;
 }
 
 
