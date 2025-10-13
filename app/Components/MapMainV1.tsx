@@ -6,6 +6,9 @@ import Svg, { Circle, G, Line, Path, Polyline, Text as SvgText } from 'react-nat
 import routes_data from '../../assets/data/routes_data.json';
 import { trackBus } from '../shared/busTrackUtils';
 import { Route, Stop } from '../shared/types/routes';
+import ButtonH221 from './Buttons/buttonH221';
+import ButtonHovey from './Buttons/buttonHovey';
+import ButtonTMC from './Buttons/buttonTMC';
 
 const VIEW_W = Dimensions.get('window').width;
 const VIEW_H = Dimensions.get('window').height;
@@ -59,7 +62,6 @@ export default function MapMain() {
   //렌더가 시작했을 때, vx,vy가 각각 바꼈으면 ref 업데이트
   useEffect(() => { vbRef.current = {vx,vy,vw,vh}; }, [vx,vy,vw,vh]);
  
-
   
   const pan = useRef(
     PanResponder.create({
@@ -152,7 +154,7 @@ export default function MapMain() {
 
   function getStationHours(s: Stop | null) {
     if (!s) return null;
-    return (s.openingHours || s.opening_hours || s.hours || s.opening || null);
+    return (s.openingHours || null);
   }
 
 
@@ -363,7 +365,7 @@ export default function MapMain() {
                   })}
                     {runningBuses.map((item:[Route,number[]], index) => {
                     return(
-                      <G x={item[1][0]-10} y={item[1][1]-10} scale={20 / 576}>
+                      <G key={`bus-${index}`} x={item[1][0]-10} y={item[1][1]-10} scale={20 / 576}>
                         <Path d="M192 64C139 64 96 107 96 160L96 448C96 477.8 116.4 502.9 144 510L144 544C144 561.7 158.3 576 176 576L192 576C209.7 576 224 561.7 224 544L224 512L416 512L416 544C416 561.7 430.3 576 448 576L464 576C481.7 576 496 561.7 496 544L496 510C523.6 502.9 544 477.8 544 448L544 160C544 107 501 64 448 64L192 64zM160 240C160 222.3 174.3 208 192 208L296 208L296 320L192 320C174.3 320 160 305.7 160 288L160 240zM344 320L344 208L448 208C465.7 208 480 222.3 480 240L480 288C480 305.7 465.7 320 448 320L344 320zM192 384C209.7 384 224 398.3 224 416C224 433.7 209.7 448 192 448C174.3 448 160 433.7 160 416C160 398.3 174.3 384 192 384zM448 384C465.7 384 480 398.3 480 416C480 433.7 465.7 448 448 448C430.3 448 416 433.7 416 416C416 398.3 430.3 384 448 384zM248 136C248 122.7 258.7 112 272 112L368 112C381.3 112 392 122.7 392 136C392 149.3 381.3 160 368 160L272 160C258.7 160 248 149.3 248 136z"
                           fill={item[0] == routeTMC?"#0345fc":(item[0] == routeH221?"#009623": "#ff2a00")}
                         />
@@ -395,12 +397,6 @@ export default function MapMain() {
             <FontAwesome6 name="arrow-rotate-right" size={20} color="#fff" />
           </TouchableOpacity>
         </Animated.View>
-
-        {/* <View style={[styles.buttonBox, styles.openBox]}>
-          <TouchableOpacity style={styles.buttons} onPress={() => {toggleSheet('')}} >
-            <FontAwesome6 name="arrow-rotate-right" size={20} color="#fff" />
-          </TouchableOpacity>
-        </View> */}
       </View>
 
         <Animated.View style={{position: 'absolute', left: 0, right: 0, bottom: 0, transform: [{ translateY: stationDetail_offsetY }]}}>
@@ -411,29 +407,26 @@ export default function MapMain() {
         offset={[0,-4]}
         >
           <View style={styles.stationDetail}>
-            <View style={styles.stationDetailContent}>
-              {selectedStation ? (
-                <>
-                  <Text style={styles.stationTitle}>{selectedStation.name}</Text>
-                  <Text style={styles.stationSubtitle}>
-                    {selectedStation.description ?? ''}
+            <View style={styles.stationDetailContent}>          
+                  <Text style={styles.stationTitle}>{selectedStation ? selectedStation.name : ''}</Text>
+                  <Text style={styles.stationBusList}>
+                    {selectedStation && selectedStation.intersaction3 ? <><ButtonTMC/><ButtonH221/><ButtonHovey/></> : 
+                    selectedStation && selectedStation.intersaction2 ? <><ButtonH221/><ButtonHovey/></> :
+                    selectedStation && routeTMC.stops.some(s => s.index === selectedStation.index) ? <ButtonTMC/> :
+                    selectedStation && routeH221.stops.some(s => s.index === selectedStation.index) ? <ButtonH221/> :
+                    selectedStation && routeHovey.stops.some(s => s.index === selectedStation.index) ? <ButtonHovey/> : ''
+                    }
                   </Text>
                   <Text style={styles.stationHours}>
-                    {getStationHours(selectedStation) ? `Opening: ${getStationHours(selectedStation)}` : 'Hours: not available'}
-                  </Text>
-
-                  <View style={{ marginTop: 12, flexDirection: 'row' }}>
-                    <TouchableOpacity onPress={() => toggleSheet(null)} style={[styles.buttons, { backgroundColor: '#333', marginRight: 12 }]}>
-                      <Text style={{ color: '#fff' }}>Close</Text>
-                    </TouchableOpacity>
-                  </View>
-                </>
-              ) : (
-                <View style={{ padding: 12 }}>
-                  <Text style={{ fontSize: 16, fontWeight: '600' }}>No station selected</Text>
-                </View>
-              )}
+                    {selectedStation && getStationHours(selectedStation) ? `Opening: ${getStationHours(selectedStation)}` : 'Hours: not available'}
+                  </Text>                              
             </View>
+            <View style={ styles.stationDetailCloseButton }>
+              <TouchableOpacity onPress={() => toggleSheet(null)} style={[styles.buttons, { backgroundColor: '#333', width: 60, height: 30, justifyContent: 'center' }]}>
+                <Text style={{ color: '#fff' }}>Close</Text>
+              </TouchableOpacity>
+            </View>
+
           </View>
           </Shadow>
           </Animated.View>
@@ -498,14 +491,20 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
   },
-  stationSubtitle: {
-    marginTop: 6,
+  stationBusList: {
+    marginTop: 10,
     color: '#444',
   },
   stationHours: {
     marginTop: 8,
     fontSize: 14,
     color: '#111',
+  },
+  stationDetailCloseButton: {
+    top: 10, right:10,
+    position: 'absolute',
+    borderRadius: 10,
+    padding: 6
   },
   bus: {
     position: 'absolute',

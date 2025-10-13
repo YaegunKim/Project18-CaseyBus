@@ -11,9 +11,6 @@ export interface Stop {
   description?: string; // 선택적
   
   openingHours?: string;
-  opening_hours?: string;
-  hours?: string;
-  opening?: string;
 }
 
 
