@@ -9,6 +9,8 @@ import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Fonts } from '@/constants/theme';
 
+import CampCaseyWeather from '../Components/CaseyWeather';
+
 export default function TabTwoScreen() {
   return (
     <ParallaxScrollView
@@ -30,6 +32,11 @@ export default function TabTwoScreen() {
           Explore
         </ThemedText>
       </ThemedView>
+
+          {/* Add weather component */}
+          < CampCaseyWeather />
+
+
       <ThemedText>This app includes example code to help you get started.</ThemedText>
       <Collapsible title="File-based routing">
         <ThemedText>
