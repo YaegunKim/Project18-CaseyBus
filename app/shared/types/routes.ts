@@ -1,16 +1,26 @@
 // 📌 개별 정류장(Stop)
+// export interface Stop {
+//   index: number;
+//   name: string;
+//   durationFromStart: number;
+//   x: number;
+//   y: number;
+//   intersaction2?: boolean; // 선택적
+//   intersaction3?: boolean; // 선택적
+//   revisit?: boolean;       // 선택적
+// }
+
 export interface Stop {
-  index: number;
   name: string;
-  durationFromStart: number;
   x: number;
   y: number;
-  intersaction2?: boolean; // 선택적
-  intersaction3?: boolean; // 선택적
-  revisit?: boolean;       // 선택적
-  description?: string; // 선택적
-  
+  // ...other fields...
   openingHours?: string;
+  opening_hours?: string;
+  hours?: string;
+  opening?: string;
+  description?: string;
+  [key: string]: any; // (optional) allows any extra property
 }
 
 

@@ -3,13 +3,16 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, NativeTouchEvent, PanResponder, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Svg, { Circle, G, Line, Polyline } from 'react-native-svg';
 
-
+// Screen width
 const VIEW_W = Dimensions.get('window').width;
+// Screen height
 const VIEW_H = Dimensions.get('window').height;
 const DOC_W  = 1000;
 const DOC_H  = 1000;
 
+/* Helper functions */
 
+// Returns value that falls within min and max
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
 }
@@ -27,6 +30,8 @@ function getCenterLocationY(touches: NativeTouchEvent[]){
   const [touch1 , touch2] = touches;
   return (touch1.locationY+touch2.locationY)/2
 }
+
+/* Main map component */
 
 export default function MapMain() {
   const [vx, setVx] = useState(0); // viewBox x 좌단
