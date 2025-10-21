@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 
-import MapMain from '../Components/MapMainV1';
+import MapMain from '../Components/MapMain';
 
 
 export default function HomeScreen() {
