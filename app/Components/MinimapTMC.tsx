@@ -4,7 +4,7 @@ import { Animated, Dimensions, NativeTouchEvent, PanResponder, StyleSheet, Text,
 import { Shadow } from 'react-native-shadow-2';
 import Svg, { Circle, G, Line, Path, Polyline, Text as SvgText } from 'react-native-svg';
 import routes_data from '../../assets/data/routes_data.json';
-import { trackBus } from '../shared/busTrackUtils';
+import { trackBus } from '../../assets/old/busTrackUtilsOld';
 import { Route, Stop } from '../shared/types/routes';
 import ButtonH221 from './Buttons/buttonH221';
 import ButtonHovey from './Buttons/buttonHovey';

@@ -1,8 +1,8 @@
-import routesData from '../../assets/data/routes_data.json';
-import svgPoint from '../../assets/data/svg_data.json';
-import { isHoliday } from './holidayUtils';
-import { Route, Stop } from './types/routes';
-import { SvgPoint } from './types/svg';
+import { isHoliday } from '../../app/shared/holidayUtils';
+import { Route, Stop } from '../../app/shared/types/routes';
+import { SvgPoint } from '../../app/shared/types/svg';
+import routesData from '../data/routes_data.json';
+import svgPoint from '../data/svg_data.json';
 
 const [routeTMC, routeH221, routeHovey] = routesData.routes;
 const [svgPointsTMC, svgPointsH221, svgPointsHovey] = svgPoint.svgPoints;
@@ -71,7 +71,7 @@ function getRunnigBus(route:Route, today:Date): [string[], number] {
 function getElapsedTime(time:string, today:Date){
   const busTime = new Date(today.toLocaleDateString("en-CA")+" "+time);
   const elapsedTimeinMil = today.getTime() - busTime.getTime();
-  return elapsedTimeinMil/second;
+  return elapsedTimeinMil/minute;
 }
 
 
