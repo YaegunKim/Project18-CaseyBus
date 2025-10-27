@@ -117,8 +117,8 @@ export default function MapMain() {
   ).current;
 
   //stationDetail window
-  const stationDetail_H = VIEW_H / 4;
-  const stationDetail_offsetY = useRef(new Animated.Value(stationDetail_H)).current;
+  const [sheetH, setSheetH] = useState<number>(0);
+  const offsetY = useRef(new Animated.Value(VIEW_H / 4)).current; // 열린 상태 기준 0
   const isStationDetailOpened = useRef(false);
 
 
@@ -128,15 +128,18 @@ export default function MapMain() {
       setSelectedStation(station);
       isStationDetailOpened.current = openWindow;
 
-      Animated.spring(stationDetail_offsetY, {
-        toValue: openWindow ? 0 : stationDetail_H,
+      const h = sheetH || VIEW_H / 4;
+
+      Animated.spring(offsetY, {
+        toValue: openWindow ? 0 : h,
         useNativeDriver: true,
         damping: 100,
         stiffness: 180,
         mass: 0.8,
+        overshootClamping: true,
       }).start();
     },
-    [stationDetail_offsetY, stationDetail_H]
+    [offsetY, sheetH]
   );
   
   // const [runningBuses, setRunnigBuses] = useState(trackBus());
@@ -377,32 +380,32 @@ export default function MapMain() {
             
           </Svg>
         </Animated.View>
-        <Animated.View style={[styles.buttonBox, {transform: [{ translateY: Animated.add(stationDetail_offsetY, 380) }]}]}>
+        <Animated.View style={[styles.buttonBox, {transform: [{ translateY: Animated.add(offsetY, 380) }]}]}>
           <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: vw/1.25, vh: vh/1.25, vx: vx+0.1*vw, vy: vy+0.1*vh}));} } >
             <FontAwesome6 name="plus" size={20} color="#fff" />
           </TouchableOpacity>
         </Animated.View>
-        <Animated.View style={[styles.buttonBox, {transform: [{ translateY: Animated.add(stationDetail_offsetY, 425) }]}]}>
+        <Animated.View style={[styles.buttonBox, {transform: [{ translateY: Animated.add(offsetY, 425) }]}]}>
           <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: vw/0.8, vh: vh/0.8, vx: vx-0.125*vw, vy: vy-0.125*vh}));} } >
             <FontAwesome6 name="minus" size={20} color="#fff" />
           </TouchableOpacity>
         </Animated.View>
-        <Animated.View style={[styles.buttonBox, {transform: [{ translateY: Animated.add(stationDetail_offsetY, 470) }]}]}>
+        <Animated.View style={[styles.buttonBox, {transform: [{ translateY: Animated.add(offsetY, 470) }]}]}>
           <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: VIEW_W, vh: VIEW_H, vx: 0, vy: 200}));} } >
             <FontAwesome6 name="arrow-rotate-right" size={20} color="#fff" />
           </TouchableOpacity>
         </Animated.View>
-      </View>
+      
 
-        <Animated.View style={{position: 'absolute', left: 0, right: 0, bottom: 0, transform: [{ translateY: stationDetail_offsetY }]}}>
+        <Animated.View style={{position: 'absolute', left: 0, bottom: -45, transform: [{ translateY: offsetY }]}}> {/* Magic Number */}
         <Shadow
         startColor={isStationDetailOpened.current ? "#00000030" :"#00000000"}
         endColor={"#00000000"}
         distance={35}
-        offset={[0,-4]}
+        offset={[0,0]}
         >
           
-          <View style={styles.stationDetail}>
+          <View style={styles.stationDetail} onLayout={e => setSheetH(e.nativeEvent.layout.height)}>
             <ToggleStation selectedStation={selectedStation} toggleSheet={toggleSheet}/>
             <View style={ styles.stationDetailCloseButton }>
               <TouchableOpacity onPress={() => toggleSheet(null)} style={[styles.buttons, { backgroundColor: '#333', width: 60, height: 30, justifyContent: 'center' }]}>
@@ -413,6 +416,7 @@ export default function MapMain() {
           </View>
           </Shadow>
           </Animated.View>
+      </View>
     </>
   );
 }
@@ -454,16 +458,17 @@ const styles = StyleSheet.create({
   },
 
   stationDetail: {
+    padding: 0,
     width: VIEW_W,
     height: VIEW_H / 4,
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffffff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     // iOS shadow
-    shadowColor: '#000000ff',
-    shadowOffset: { width: 20, height: 20 },
-    shadowOpacity: 1,
-    shadowRadius: 20,
+    // shadowColor: '#000000ff',
+    // shadowOffset: { width: 20, height: 20 },
+    // shadowOpacity: 1,
+    // shadowRadius: 20,
     // Android shadow
     // elevation: 30,
   },
