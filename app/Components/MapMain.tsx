@@ -380,17 +380,17 @@ export default function MapMain() {
             
           </Svg>
         </Animated.View>
-        <Animated.View style={[styles.buttonBox, {transform: [{ translateY: Animated.add(offsetY, 380) }]}]}>
+        <Animated.View style={[styles.buttonBox, {top: 30}]}>
           <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: vw/1.25, vh: vh/1.25, vx: vx+0.1*vw, vy: vy+0.1*vh}));} } >
             <FontAwesome6 name="plus" size={20} color="#fff" />
           </TouchableOpacity>
         </Animated.View>
-        <Animated.View style={[styles.buttonBox, {transform: [{ translateY: Animated.add(offsetY, 425) }]}]}>
+        <Animated.View style={[styles.buttonBox, {top: 75}]}>
           <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: vw/0.8, vh: vh/0.8, vx: vx-0.125*vw, vy: vy-0.125*vh}));} } >
             <FontAwesome6 name="minus" size={20} color="#fff" />
           </TouchableOpacity>
         </Animated.View>
-        <Animated.View style={[styles.buttonBox, {transform: [{ translateY: Animated.add(offsetY, 470) }]}]}>
+        <Animated.View style={[styles.buttonBox, {top: 120}]}>
           <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: VIEW_W, vh: VIEW_H, vx: 0, vy: 200}));} } >
             <FontAwesome6 name="arrow-rotate-right" size={20} color="#fff" />
           </TouchableOpacity>
