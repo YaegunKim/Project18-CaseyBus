@@ -39,7 +39,7 @@ export default function ToggleStation({
   return (
     <View style={styles.stationDetailContent}>          
         <Text style={styles.stationTitle}>{selectedStation ? selectedStation.name : ''}</Text>
-            <Text style={styles.stationBusList}>
+            <View style={styles.stationBusList}>
               {selectedStation?.revisit ? 
               <View style={[styles.busRow]}>
               <View style={[styles.busButtonBox, {width: 70}]}>
@@ -50,8 +50,8 @@ export default function ToggleStation({
                 </View>
                 </View>
 
-              :'yes' }
-            </Text>
+              :selectedStation?.description }
+            </View>
         <ScrollView style={styles.upcomingBusBlockBox}>
         {selectedStation?.revisit?
         routeList.map((route, idx) => {
