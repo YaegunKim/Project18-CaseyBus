@@ -8,7 +8,7 @@
       "highlighted" : false,
       "stops": [
         { "index": 1, "name": "Gate#1/Casey Bus Terminal", "durationFromStart": 0,  "x": 50, "y": 550, "intersaction3": true },
-        { "index": 2, "name": "Bowling Center",            "durationFromStart": 90,  "x": 150, "y": 550, "intersaction3": true },
+        { "index": 2, "name": "Bowling Center",            "durationFromStart": 90,  "x": 150, "y": 550, "intersaction3": true, "description": "The Bowling Center offers a fun and relaxing environment for all ages. Enjoy a game of bowling with friends and family, complete with shoe rentals, food, and drinks available on-site." },
         { "index": 3, "name": "W.E.B/S-2336(Main DFAC)",   "durationFromStart": 150,  "x": 250, "y": 550, "intersaction3": true },
         { "index": 4, "name": "CAC",                       "durationFromStart": 230,  "x": 350, "y": 550, "intersaction3": true },
         { "index": 5, "name": "1/72 ARMOR(Dragon valley)", "durationFromStart": 480,  "x": 470, "y": 400 },
@@ -85,9 +85,9 @@
         { "index": 18, "name": "Barbor Shop",               "durationFromStart": 1680, "x": 285, "y": 670 },
         { "index": 19, "name": "4/7 CAV",                   "durationFromStart": 1920, "x": 490, "y": 670 },
 
-        { "index": 20, "name": "BTB",                       "durationFromStart": 2170, "x": 700, "y": 770 },
-        { "index": 21, "name": "Range Control",             "durationFromStart": 2330, "x": 750, "y": 700 },
-        { "index": 22, "name": "CTAS",                      "durationFromStart": 2420, "x": 750, "y": 640 },
+        { "index": 20, "name": "BTB",                       "durationFromStart": 2170, "x": 700, "y": 770, "revisit": true },
+        { "index": 21, "name": "Range Control",             "durationFromStart": 2330, "x": 750, "y": 700, "revisit": true },
+        { "index": 22, "name": "CTAS",                      "durationFromStart": 2420, "x": 750, "y": 640, "revisit": true },
 
         { "index": 23, "name": "Worrier Club",              "durationFromStart": 2510, "x": 720, "y": 570, "intersaction2": true, "revisit": true },
         { "index": 24, "name": "Movie Theater",             "durationFromStart": 2595, "x": 620, "y": 570, "intersaction2": true, "revisit": true },

@@ -16,6 +16,7 @@ const ButtonHovey = () => {
 
 const styles = StyleSheet.create({
   button: {
+    width: 70,
     paddingVertical: 1,
     paddingHorizontal: 7,
     borderRadius: 8,

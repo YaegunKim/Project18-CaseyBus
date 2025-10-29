@@ -119,7 +119,7 @@ export default function MapMain() {
 
   //stationDetail window
   const [sheetH, setSheetH] = useState<number>(0);
-  const offsetY = useRef(new Animated.Value(VIEW_H / 4)).current; // 열린 상태 기준 0
+  const offsetY = useRef(new Animated.Value(VIEW_H / 3)).current; // 열린 상태 기준 0
   const isStationDetailOpened = useRef(false);
 
 
@@ -129,7 +129,7 @@ export default function MapMain() {
       setSelectedStation(station);
       isStationDetailOpened.current = openWindow;
 
-      const h = sheetH || VIEW_H / 4;
+      const h = sheetH || VIEW_H / 3;
 
       Animated.spring(offsetY, {
         toValue: openWindow ? 0 : h,
@@ -409,7 +409,7 @@ export default function MapMain() {
         >
           
           <View style={styles.stationDetail} onLayout={e => setSheetH(e.nativeEvent.layout.height)}>
-            <ToggleStation selectedStation={selectedStation} toggleSheet={toggleSheet}/>
+            <ToggleStation selectedStation={selectedStation}/>
             <View style={ styles.stationDetailCloseButton }>
               <TouchableOpacity onPress={() => toggleSheet(null)} style={[styles.buttons, { backgroundColor: '#333', width: 60, height: 30, justifyContent: 'center' }]}>
                 <Text style={{ color: '#fff' }}>Close</Text>
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
   stationDetail: {
     padding: 0,
     width: VIEW_W,
-    height: VIEW_H / 4,
+    height: VIEW_H / 3,
     backgroundColor: '#ffffffff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,

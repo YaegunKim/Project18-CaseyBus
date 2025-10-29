@@ -164,16 +164,17 @@ function getCurrentLocation(pointList:number[][], progress:number) {
 
 /////////next Bus Track Utils/////////
 
-export function getNextBusTime(schedule:string[], today:Date): string[]{
+export function getNextBusTime(schedule:string[], today:Date, durationFromStart:number): string[]{
   for(let i=0; i<schedule.length;i++){
     if(today.getHours()==0||today.getHours()==1) today.setTime(today.getTime() - 24*60*60*1000);
 
     const busTime = new Date(today.toLocaleDateString("en-CA")+" "+schedule[i]);
+    busTime.setSeconds(busTime.getSeconds() + durationFromStart);
     if(busTime.getTime() > today.getTime()){
-      const TimeLeftInMinutes = Math.ceil((busTime.getTime()-today.getTime())/minute);
-      const TimeLeftInSeconds = Math.ceil(((busTime.getTime()-today.getTime())/second)%60);
+      const TimeLeftInMinutes = Math.floor((busTime.getTime()-today.getTime())/minute);
+      const TimeLeftInSeconds = Math.floor(((busTime.getTime()-today.getTime())/second)%60);
       if(TimeLeftInMinutes >= 1){
-        return [schedule[i-1], schedule[i], `${TimeLeftInMinutes} min ${TimeLeftInSeconds}${TimeLeftInMinutes > 1 ? 's' : ''}`];
+        return [schedule[i-1], schedule[i], `${TimeLeftInMinutes} min ${TimeLeftInSeconds} sec`];
       }else{
         return [schedule[i-1], schedule[i], `Approaching`];
       }

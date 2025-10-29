@@ -16,6 +16,7 @@ const ButtonTMC = () => {
 
 const styles = StyleSheet.create({
   button: {
+    width: 70,
     paddingVertical: 1,
     paddingHorizontal: 7,
     borderRadius: 8,
@@ -23,6 +24,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   text: {
+    paddingLeft: 5,
     color: '#fff',
     fontWeight: '600',
   },

@@ -35,7 +35,7 @@ export default function DepartingBusBlock({
     }, []);
 
       const nextBus = React.useMemo(() => {
-        return getNextBusTime(route.schedule_weekdays, new Date());
+        return getNextBusTime(route.schedule_weekdays, new Date(), 0);
       }, [tick]);
     
       
