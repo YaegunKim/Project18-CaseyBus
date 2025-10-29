@@ -173,10 +173,10 @@ export function getNextBusTime(schedule:string[], today:Date): string[]{
       const TimeLeftInMinutes = Math.ceil((busTime.getTime()-today.getTime())/minute);
       const TimeLeftInSeconds = Math.ceil(((busTime.getTime()-today.getTime())/second)%60);
       if(TimeLeftInMinutes >= 1){
-        return [schedule[i], `${TimeLeftInMinutes} min ${TimeLeftInSeconds}${TimeLeftInMinutes > 1 ? 's' : ''}`];
+        return [schedule[i-1], schedule[i], `${TimeLeftInMinutes} min ${TimeLeftInSeconds}${TimeLeftInMinutes > 1 ? 's' : ''}`];
       }else{
-        return [schedule[i], `Approaching`];
+        return [schedule[i-1], schedule[i], `Approaching`];
       }
     }
   }
-  return [ 'No Bus', 'null'];}
+  return ['No Bus', 'No Bus', 'null'];}

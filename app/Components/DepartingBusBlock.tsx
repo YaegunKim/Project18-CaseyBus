@@ -15,9 +15,9 @@ export default function DepartingBusBlock({
     route
 }: { route: Route }) {
 
-    const Points = route == routeTMC ? "-120,460 0,460 0,500 -120,500 -120,460" :
-                   route == routeH221 ? "-120,540 0,540 0,580 -120,580 -120,540" :
-                   "-120,620 0,620 0,660 -120,660 -120,620";
+    const Points = route == routeTMC ? "-120,450 0,450 0,510 -120,510 -120,450" :
+                   route == routeH221 ? "-120,530 0,530 0,590 -120,590 -120,530" :
+                   "-120,610 0,610 0,670 -120,670 -120,610";
 
     const Cy = route == routeTMC ? 480 :
                route == routeH221 ? 560 :
@@ -35,7 +35,7 @@ export default function DepartingBusBlock({
     }, []);
 
       const nextBus = React.useMemo(() => {
-        return getNextBusTime(route.schedule_weekdays, new Date())[1];
+        return getNextBusTime(route.schedule_weekdays, new Date());
       }, [tick]);
     
       
@@ -59,10 +59,10 @@ export default function DepartingBusBlock({
             opacity={1}
             points={Points}
         />
-         <Circle cx={-100} cy={Cy} r={18} fill={Color} />
+         <Circle cx={-125} cy={Cy} r={18} fill={Color} />
          <SvgText
             fill="#fff"
-            x={-100} y={Cy+2}
+            x={-125} y={Cy+1}
             textAnchor="middle"
             alignmentBaseline="middle"
             fontSize={10}
@@ -70,10 +70,44 @@ export default function DepartingBusBlock({
         {route.name}
         </SvgText>
         <SvgText
-            x={-75} y={Cy+4}
-            fontSize={10}
+            x={-100} y={Cy-20}
+            fontSize={8}
             fontWeight="500">
-        Next: {nextBus ? nextBus : 'No more today'}
+        Next:
+        </SvgText>
+        <SvgText
+            x={-100} y={Cy}
+            fontSize={18}
+            fontWeight="500">
+        {nextBus ? nextBus[1] : 'No more today'}
+        </SvgText>
+        <SvgText
+            x={-52} y={Cy-2}
+            fontSize={8}
+            fontWeight="500">
+        ({nextBus ? nextBus[2] : 'No more today'})
+        </SvgText>
+        <Polyline
+            stroke={Color}
+            strokeWidth={1}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            opacity={1}
+            points={`-100,${Cy+8} -10,${Cy+8}`}
+        />
+        <SvgText
+            x={-100} y={Cy+20}
+            opacity={0.5}
+            fontSize={8}
+            fontWeight="500">
+        Prev:
+        </SvgText>
+        <SvgText
+            x={-80} y={Cy+22}
+            opacity={0.5}
+            fontSize={13}
+            fontWeight="500">
+        {nextBus ? nextBus[0] : 'No more today'}
         </SvgText>
     </G>
     )

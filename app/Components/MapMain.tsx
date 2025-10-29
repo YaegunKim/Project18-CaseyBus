@@ -46,7 +46,7 @@ export default function MapMain() {
   }, [highlightRoutes]);
 
   // Pan을 위한 state/ref
-  const [{vx,vy,vw,vh}, setVB] = useState({ vx: 0, vy: 200, vw: VIEW_W, vh: VIEW_H });
+  const [{vx,vy,vw,vh}, setVB] = useState({ vx: -150, vy: 170, vw: VIEW_W, vh: VIEW_H });
   const vbRef = useRef({ vx:0, vy:200, vw:VIEW_W, vh:VIEW_H });
   const startRef = useRef({ vx: 0, vy: 0, vw: VIEW_W, vh: VIEW_H});
   const tapStartRef = useRef({ t: 0 });
@@ -394,13 +394,13 @@ export default function MapMain() {
           </TouchableOpacity>
         </Animated.View>
         <Animated.View style={[styles.buttonBox, {top: 120}]}>
-          <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: VIEW_W, vh: VIEW_H, vx: 0, vy: 200}));} } >
+          <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: VIEW_W, vh: VIEW_H, vx: -150, vy: 170}));} } >
             <FontAwesome6 name="arrow-rotate-right" size={20} color="#fff" />
           </TouchableOpacity>
         </Animated.View>
       
 
-        <Animated.View style={{position: 'absolute', left: 0, bottom: -45, transform: [{ translateY: offsetY }]}}> {/* Magic Number */}
+        <Animated.View style={{position: 'absolute', left: 0, bottom: -45, transform: [{ translateY: offsetY }]}}>
         <Shadow
         startColor={isStationDetailOpened.current ? "#00000030" :"#00000000"}
         endColor={"#00000000"}
