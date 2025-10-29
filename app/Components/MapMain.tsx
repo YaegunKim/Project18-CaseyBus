@@ -6,6 +6,7 @@ import Svg, { Circle, G, Line, Path, Polyline, Text as SvgText } from 'react-nat
 import routes_data from '../../assets/data/routes_data.json';
 import { trackBus } from '../shared/busTrackUtils';
 import { Route, Stop } from '../shared/types/routes';
+import DepartingBusBlock from './DepartingBusBlock';
 import ToggleStation from './ToggleStation';
 
 const VIEW_W = Dimensions.get('window').width;
@@ -182,7 +183,6 @@ export default function MapMain() {
                   
                   </G>
                                
-                  {/* <Text x={30} y={50} transform="rotate(-45, 30, 50)">hello</Text> */}
                   <G id="route-H221">
                     <Polyline
                       fill="none"
@@ -217,6 +217,11 @@ export default function MapMain() {
                     />
                   </G>
 
+
+                  <DepartingBusBlock route={routeTMC}/>
+                  <DepartingBusBlock route={routeH221}/>
+                  <DepartingBusBlock route={routeHovey}/>
+
                   {/* Interchanges (두 번 그려 외곽선 효과: 검정 → 흰색) */}
                   <G id="interchanges">
                     {/* 50,550 - 50,570 */}
@@ -249,9 +254,6 @@ export default function MapMain() {
                   </G>
             
                   {/* Dots */}
-                  
-                          
-
                   {routeHovey.stops.map((station:Stop, index) => {
                     return(
                       <G key={`hovey-${index}`}>
@@ -293,8 +295,7 @@ export default function MapMain() {
                       </G>
 
                       ) // return
-                  })}
-                  
+                  })}             
                   {routeTMC.stops.map((station, index) => {
                     return(
                       <G key={`tmc-${index}`}>
@@ -313,7 +314,7 @@ export default function MapMain() {
 
 
 
-
+                  {/* text */}
                   {routeTMC.stops.map((station, index) => {
                     if(station.revisit) return null;
                     if(station.intersaction3 && (routeH221.highlighted || routeHovey.highlighted)) return null;
@@ -329,7 +330,7 @@ export default function MapMain() {
                     ) 
                   })}
 
-                  {/* text */}
+                  
                   {routeH221.stops.map((station:Stop, index) => {
                     if(station.revisit) return null;
                     if(station.intersaction3 && !routeH221.highlighted) return null;
@@ -361,6 +362,8 @@ export default function MapMain() {
                     </SvgText>
                     ) 
                   })}
+
+                  {/* Buses */}
                     {runningBuses.map((item:[Route,number[]], index) => {
                     return(
                       <G key={`bus-${index}`} x={item[1][0]-10} y={item[1][1]-10} scale={20 / 576}>

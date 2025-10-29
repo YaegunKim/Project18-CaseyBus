@@ -154,3 +154,29 @@ function getCurrentLocation(pointList:number[][], progress:number) {
   // console.log([finalX,finalY]);
   return [finalX,finalY];
 }
+
+
+
+
+
+
+
+
+/////////next Bus Track Utils/////////
+
+export function getNextBusTime(schedule:string[], today:Date): string[]{
+  for(let i=0; i<schedule.length;i++){
+    if(today.getHours()==0||today.getHours()==1) today.setTime(today.getTime() - 24*60*60*1000);
+
+    const busTime = new Date(today.toLocaleDateString("en-CA")+" "+schedule[i]);
+    if(busTime.getTime() > today.getTime()){
+      const TimeLeftInMinutes = Math.ceil((busTime.getTime()-today.getTime())/minute);
+      const TimeLeftInSeconds = Math.ceil(((busTime.getTime()-today.getTime())/second)%60);
+      if(TimeLeftInMinutes >= 1){
+        return [schedule[i], `${TimeLeftInMinutes} min ${TimeLeftInSeconds}${TimeLeftInMinutes > 1 ? 's' : ''}`];
+      }else{
+        return [schedule[i], `Approaching`];
+      }
+    }
+  }
+  return [ 'No Bus', 'null'];}
