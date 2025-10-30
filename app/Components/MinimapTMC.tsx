@@ -4,11 +4,10 @@ import { Animated, Dimensions, NativeTouchEvent, PanResponder, StyleSheet, Text,
 import { Shadow } from 'react-native-shadow-2';
 import Svg, { Circle, G, Line, Path, Polyline, Text as SvgText } from 'react-native-svg';
 import routes_data from '../../assets/data/routes_data.json';
-import { trackBus } from '../../assets/old/busTrackUtilsOld';
+import { trackBus } from '../shared/busTrackUtils';
 import { Route, Stop } from '../shared/types/routes';
-import ButtonH221 from './Buttons/buttonH221';
-import ButtonHovey from './Buttons/buttonHovey';
-import ButtonTMC from './Buttons/buttonTMC';
+import DepartingBusBlock from './DepartingBusBlock';
+import ToggleStation from './ToggleStation';
 
 const VIEW_W = Dimensions.get('window').width;
 const VIEW_H = Dimensions.get('window').height;
@@ -47,7 +46,7 @@ export default function MinimapTMC() {
   }, [highlightRoutes]);
 
   // Pan을 위한 state/ref
-  const [{vx,vy,vw,vh}, setVB] = useState({ vx: 0, vy: 200, vw: VIEW_W, vh: VIEW_H });
+  const [{vx,vy,vw,vh}, setVB] = useState({ vx: -150, vy: 170, vw: VIEW_W, vh: VIEW_H });
   const vbRef = useRef({ vx:0, vy:200, vw:VIEW_W, vh:VIEW_H });
   const startRef = useRef({ vx: 0, vy: 0, vw: VIEW_W, vh: VIEW_H});
   const tapStartRef = useRef({ t: 0 });
@@ -119,8 +118,8 @@ export default function MinimapTMC() {
   ).current;
 
   //stationDetail window
-  const stationDetail_H = VIEW_H / 4;
-  const stationDetail_offsetY = useRef(new Animated.Value(stationDetail_H)).current;
+  const [sheetH, setSheetH] = useState<number>(0);
+  const offsetY = useRef(new Animated.Value(VIEW_H / 3)).current; // 열린 상태 기준 0
   const isStationDetailOpened = useRef(false);
 
 
@@ -130,17 +129,21 @@ export default function MinimapTMC() {
       setSelectedStation(station);
       isStationDetailOpened.current = openWindow;
 
-      Animated.spring(stationDetail_offsetY, {
-        toValue: openWindow ? 0 : stationDetail_H,
+      const h = sheetH || VIEW_H / 3;
+
+      Animated.spring(offsetY, {
+        toValue: openWindow ? 0 : h,
         useNativeDriver: true,
         damping: 100,
         stiffness: 180,
         mass: 0.8,
+        overshootClamping: true,
       }).start();
     },
-    [stationDetail_offsetY, stationDetail_H]
+    [offsetY, sheetH]
   );
   
+  // const [runningBuses, setRunnigBuses] = useState(trackBus());
   const [tick, setTick] = useState(0);
   useEffect(() => {
     const id = setInterval(() => setTick(t => t + 1), 1000); // 1초마다
@@ -151,10 +154,7 @@ export default function MinimapTMC() {
     return trackBus(new Date()); // or trackBus(Date.now()) 처럼 필요 파라미터 전달
   }, [tick /*, highlightedRoute 등 필요할 때만 추가 */]);
 
-  function getStationHours(s: Stop | null) {
-    if (!s) return null;
-    return (s.openingHours || null);
-  }
+
 
 
   return (
@@ -183,8 +183,10 @@ export default function MinimapTMC() {
                   
                   </G>
                                
-                  {/* <Text x={30} y={50} transform="rotate(-45, 30, 50)">hello</Text> */}
 
+
+
+                  <DepartingBusBlock route={routeTMC}/>
 
                   {/* Interchanges (두 번 그려 외곽선 효과: 검정 → 흰색) */}
                   <G id="interchanges">
@@ -203,34 +205,32 @@ export default function MinimapTMC() {
                     {/* 350,550 - 350,551 */}
                     <Line x1={350} y1={550} x2={350} y2={551} stroke="black" strokeWidth={18} strokeLinecap="round" />
                     <Line x1={350} y1={550} x2={350} y2={551} stroke="white" strokeWidth={15} strokeLinecap="round" />
+            
                   </G>
             
                   {/* Dots */}
-                  
-                          
-
-                  
+           
                   {routeTMC.stops.map((station, index) => {
                     return(
                       <G key={`tmc-${index}`}>
                         <Circle cx={station.x}  cy={station.y}
                                 r={station.intersaction3? 3 : 1.5}
-                                fill={station.intersaction3? "#0345fc" : "white"}
+                                fill={station.intersaction3? (routeH221.highlighted || routeHovey.highlighted? "#0345fc50" : "#0345fc") : "white"}
                                 />
                         <Circle cx={station.x}  cy={station.y}
                                 r={20}
                                 fill='black'
                                 opacity={0}
-                                // onPress={() => {toggleSheet(station)}}/>
-                                onPress={() => {console.log("Hey")}}/>
+                                onPress={() => {toggleSheet(station)}}/>
                       </G>
                     ) // return
                   })}
 
+
+
                   {/* text */}
                   {routeTMC.stops.map((station, index) => {
                     if(station.revisit) return null;
-                    if(station.intersaction3 && (routeH221.highlighted || routeHovey.highlighted)) return null;
                     return (
                       <SvgText
                       key={`tmc-text-${index}`}
@@ -243,16 +243,18 @@ export default function MinimapTMC() {
                     ) 
                   })}
 
+                  
 
+                  {/* Buses */}
                     {runningBuses.map((item:[Route,number[]], index) => {
-                        if(item[0] != routeTMC ) return null;
+                      if(item[0] != routeTMC) return null;
                     return(
                       <G key={`bus-${index}`} x={item[1][0]-10} y={item[1][1]-10} scale={20 / 576}>
                         <Path d="M192 64C139 64 96 107 96 160L96 448C96 477.8 116.4 502.9 144 510L144 544C144 561.7 158.3 576 176 576L192 576C209.7 576 224 561.7 224 544L224 512L416 512L416 544C416 561.7 430.3 576 448 576L464 576C481.7 576 496 561.7 496 544L496 510C523.6 502.9 544 477.8 544 448L544 160C544 107 501 64 448 64L192 64zM160 240C160 222.3 174.3 208 192 208L296 208L296 320L192 320C174.3 320 160 305.7 160 288L160 240zM344 320L344 208L448 208C465.7 208 480 222.3 480 240L480 288C480 305.7 465.7 320 448 320L344 320zM192 384C209.7 384 224 398.3 224 416C224 433.7 209.7 448 192 448C174.3 448 160 433.7 160 416C160 398.3 174.3 384 192 384zM448 384C465.7 384 480 398.3 480 416C480 433.7 465.7 448 448 448C430.3 448 416 433.7 416 416C416 398.3 430.3 384 448 384zM248 136C248 122.7 258.7 112 272 112L368 112C381.3 112 392 122.7 392 136C392 149.3 381.3 160 368 160L272 160C258.7 160 248 149.3 248 136z"
-                          fill={item[0] == routeTMC?"#0345fc":(item[0] == routeH221?"#009623": "#ff2a00")}
+                          fill="#0345fc"
                         />
                         <Path d="M192 64C139 64 96 107 96 160L96 448C96 477.8 116.4 502.9 144 510L144 544C144 561.7 158.3 576 176 576L192 576C209.7 576 224 561.7 224 544L224 512L416 512L416 544C416 561.7 430.3 576 448 576L464 576C481.7 576 496 561.7 496 544L496 510C523.6 502.9 544 477.8 544 448L544 160C544 107 501 64 448 64L192 64zM160 240C160 222.3 174.3 208 192 208L296 208L296 320L192 320C174.3 320 160 305.7 160 288L160 240zM344 320L344 208L448 208C465.7 208 480 222.3 480 240L480 288C480 305.7 465.7 320 448 320L344 320zM192 384C209.7 384 224 398.3 224 416C224 433.7 209.7 448 192 448C174.3 448 160 433.7 160 416C160 398.3 174.3 384 192 384zM448 384C465.7 384 480 398.3 480 416C480 433.7 465.7 448 448 448C430.3 448 416 433.7 416 416C416 398.3 430.3 384 448 384zM248 136C248 122.7 258.7 112 272 112L368 112C381.3 112 392 122.7 392 136C392 149.3 381.3 160 368 160L272 160C258.7 160 248 149.3 248 136z"
-                          fill={item[0] == routeTMC?"#0345fc":(item[0] == routeH221?"#009623": "#ff2a00")}
+                          fill="#0345fc"
                           stroke="#ffffffff"
                           strokeWidth={30}
                         />
@@ -264,45 +266,33 @@ export default function MinimapTMC() {
             
           </Svg>
         </Animated.View>
-        <Animated.View style={[styles.buttonBox, {transform: [{ translateY: Animated.add(stationDetail_offsetY, 380) }]}]}>
+        <Animated.View style={[styles.buttonBox, {top: 30}]}>
           <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: vw/1.25, vh: vh/1.25, vx: vx+0.1*vw, vy: vy+0.1*vh}));} } >
             <FontAwesome6 name="plus" size={20} color="#fff" />
           </TouchableOpacity>
         </Animated.View>
-        <Animated.View style={[styles.buttonBox, {transform: [{ translateY: Animated.add(stationDetail_offsetY, 425) }]}]}>
+        <Animated.View style={[styles.buttonBox, {top: 75}]}>
           <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: vw/0.8, vh: vh/0.8, vx: vx-0.125*vw, vy: vy-0.125*vh}));} } >
             <FontAwesome6 name="minus" size={20} color="#fff" />
           </TouchableOpacity>
         </Animated.View>
-        <Animated.View style={[styles.buttonBox, {transform: [{ translateY: Animated.add(stationDetail_offsetY, 470) }]}]}>
-          <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: VIEW_W, vh: VIEW_H, vx: 0, vy: 200}));} } >
+        <Animated.View style={[styles.buttonBox, {top: 120}]}>
+          <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: VIEW_W, vh: VIEW_H, vx: -150, vy: 170}));} } >
             <FontAwesome6 name="arrow-rotate-right" size={20} color="#fff" />
           </TouchableOpacity>
         </Animated.View>
-      </View>
+      
 
-        <Animated.View style={{position: 'absolute', left: 0, right: 0, bottom: 0, transform: [{ translateY: stationDetail_offsetY }]}}>
+        <Animated.View style={{position: 'absolute', left: 0, bottom: -45, transform: [{ translateY: offsetY }]}}>
         <Shadow
         startColor={isStationDetailOpened.current ? "#00000030" :"#00000000"}
         endColor={"#00000000"}
         distance={35}
-        offset={[0,-4]}
+        offset={[0,0]}
         >
-          <View style={styles.stationDetail}>
-            <View style={styles.stationDetailContent}>          
-                  <Text style={styles.stationTitle}>{selectedStation ? selectedStation.name : ''}</Text>
-                  <Text style={styles.stationBusList}>
-                    {selectedStation && selectedStation.intersaction3 ? <><ButtonTMC/><ButtonH221/><ButtonHovey/></> : 
-                    selectedStation && selectedStation.intersaction2 ? <><ButtonH221/><ButtonHovey/></> :
-                    selectedStation && routeTMC.stops.some(s => s.index === selectedStation.index) ? <ButtonTMC/> :
-                    selectedStation && routeH221.stops.some(s => s.index === selectedStation.index) ? <ButtonH221/> :
-                    selectedStation && routeHovey.stops.some(s => s.index === selectedStation.index) ? <ButtonHovey/> : ''
-                    }
-                  </Text>
-                  <Text style={styles.stationHours}>
-                    {selectedStation && getStationHours(selectedStation) ? `Opening: ${getStationHours(selectedStation)}` : 'Hours: not available'}
-                  </Text>                              
-            </View>
+          
+          <View style={styles.stationDetail} onLayout={e => setSheetH(e.nativeEvent.layout.height)}>
+            <ToggleStation selectedStation={selectedStation}/>
             <View style={ styles.stationDetailCloseButton }>
               <TouchableOpacity onPress={() => toggleSheet(null)} style={[styles.buttons, { backgroundColor: '#333', width: 60, height: 30, justifyContent: 'center' }]}>
                 <Text style={{ color: '#fff' }}>Close</Text>
@@ -312,6 +302,7 @@ export default function MinimapTMC() {
           </View>
           </Shadow>
           </Animated.View>
+      </View>
     </>
   );
 }
@@ -353,34 +344,19 @@ const styles = StyleSheet.create({
   },
 
   stationDetail: {
+    padding: 0,
     width: VIEW_W,
-    height: VIEW_H / 4,
-    backgroundColor: '#fff',
+    height: VIEW_H / 3,
+    backgroundColor: '#ffffffff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     // iOS shadow
-    shadowColor: '#000000ff',
-    shadowOffset: { width: 20, height: 20 },
-    shadowOpacity: 1,
-    shadowRadius: 20,
+    // shadowColor: '#000000ff',
+    // shadowOffset: { width: 20, height: 20 },
+    // shadowOpacity: 1,
+    // shadowRadius: 20,
     // Android shadow
     // elevation: 30,
-  },
-  stationDetailContent: {
-    padding: 16,
-  },
-  stationTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-  },
-  stationBusList: {
-    marginTop: 10,
-    color: '#444',
-  },
-  stationHours: {
-    marginTop: 8,
-    fontSize: 14,
-    color: '#111',
   },
   stationDetailCloseButton: {
     top: 10, right:10,

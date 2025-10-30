@@ -142,6 +142,33 @@ export default function MapMain() {
     },
     [offsetY, sheetH]
   );
+
+
+    //schedule window
+  const [tableH, setTableH] = useState<number>(0);
+  const tableOffsetY = useRef(new Animated.Value(VIEW_H)).current; // 열린 상태 기준 0
+  const isTableOpened = useRef(false);
+
+
+  const toggleTable = useCallback(
+    (station: Stop | null) => {
+      const openWindow = station !== null;
+      setSelectedStation(station);
+      isTableOpened.current = openWindow;
+
+      const h = tableH || VIEW_H;
+
+      Animated.spring(tableOffsetY, {
+        toValue: openWindow ? 0 : h,
+        useNativeDriver: true,
+        damping: 100,
+        stiffness: 180,
+        mass: 0.8,
+        overshootClamping: true,
+      }).start();
+    },
+    [tableOffsetY, tableH]
+  );
   
   // const [runningBuses, setRunnigBuses] = useState(trackBus());
   const [tick, setTick] = useState(0);
@@ -218,9 +245,9 @@ export default function MapMain() {
                   </G>
 
 
-                  <DepartingBusBlock route={routeTMC}/>
-                  <DepartingBusBlock route={routeH221}/>
-                  <DepartingBusBlock route={routeHovey}/>
+                  <DepartingBusBlock route={routeTMC} onPress={() => {toggleTable(routeTMC.stops[0])}}/>
+                  <DepartingBusBlock route={routeH221} onPress={() => {toggleTable(routeH221.stops[0])}}/>
+                  <DepartingBusBlock route={routeHovey} onPress={() => {toggleTable(routeHovey.stops[0])}}/>
 
                   {/* Interchanges (두 번 그려 외곽선 효과: 검정 → 흰색) */}
                   <G id="interchanges">
@@ -419,6 +446,26 @@ export default function MapMain() {
           </View>
           </Shadow>
           </Animated.View>
+
+        <Animated.View style={{position: 'absolute', left: 0, bottom: -45, transform: [{ translateY: tableOffsetY }]}}>
+        <Shadow
+        startColor={isTableOpened.current ? "#00000030" :"#00000000"}
+        endColor={"#00000000"}
+        distance={35}
+        offset={[0,0]}
+        >
+          
+          <View style={styles.table} onLayout={e => setTableH(e.nativeEvent.layout.height)}>
+            
+            <View style={ styles.tableCloseButton }>
+              <TouchableOpacity onPress={() => toggleTable(null)} style={[styles.buttons, { backgroundColor: '#333', width: 60, height: 30, justifyContent: 'center' }]}>
+                <Text style={{ color: '#fff' }}>Close</Text>
+              </TouchableOpacity>
+            </View>
+
+          </View>
+          </Shadow>
+          </Animated.View>
       </View>
     </>
   );
@@ -476,6 +523,27 @@ const styles = StyleSheet.create({
     // elevation: 30,
   },
   stationDetailCloseButton: {
+    top: 10, right:10,
+    position: 'absolute',
+    borderRadius: 10,
+    padding: 6
+  },
+    table: {
+    padding: 0,
+    width: VIEW_W,
+    height: VIEW_H - 75,
+    backgroundColor: '#ffffffff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    // iOS shadow
+    // shadowColor: '#000000ff',
+    // shadowOffset: { width: 20, height: 20 },
+    // shadowOpacity: 1,
+    // shadowRadius: 20,
+    // Android shadow
+    // elevation: 30,
+  },
+  tableCloseButton: {
     top: 10, right:10,
     position: 'absolute',
     borderRadius: 10,

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Circle, G, Polyline, Text as SvgText } from "react-native-svg";
+import { Circle, G, Polyline, Rect, Text as SvgText } from "react-native-svg";
 import routes_data from '../../assets/data/routes_data.json';
 import { getNextBusTime } from "../shared/busTrackUtils";
 import { Route } from "../shared/types/routes";
@@ -12,8 +12,8 @@ const [routeTMC, routeH221, routeHovey] = routes_data.routes;
 
 
 export default function DepartingBusBlock({
-    route
-}: { route: Route }) {
+    route, onPress
+}: { route: Route, onPress?: () => void; }) {
 
     const Points = route == routeTMC ? "-120,450 0,450 0,510 -120,510 -120,450" :
                    route == routeH221 ? "-120,530 0,530 0,590 -120,590 -120,530" :
@@ -41,6 +41,7 @@ export default function DepartingBusBlock({
       
     return (
     <G id="next-station-H221">
+
         <Polyline
             fill="none"
             stroke= {Color}
@@ -109,6 +110,16 @@ export default function DepartingBusBlock({
             fontWeight="500">
         {nextBus ? nextBus[0] : 'No more today'}
         </SvgText>
+
+
+    <Rect
+        x={-126}
+        y={Cy - 40}
+        width={134}
+        height={80}
+        fill="transparent"
+        onPress={onPress}
+      />
     </G>
     )
 }
