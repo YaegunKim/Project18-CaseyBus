@@ -8,6 +8,7 @@ import { trackBus } from '../shared/busTrackUtils';
 import { Route, Stop } from '../shared/types/routes';
 import DepartingBusBlock from './DepartingBusBlock';
 import ToggleStation from './ToggleStation';
+import ToggleTable from './ToggleTable';
 
 const VIEW_W = Dimensions.get('window').width;
 const VIEW_H = Dimensions.get('window').height;
@@ -456,7 +457,7 @@ export default function MapMain() {
         >
           
           <View style={styles.table} onLayout={e => setTableH(e.nativeEvent.layout.height)}>
-            
+            <ToggleTable selectedStation={selectedStation}/>
             <View style={ styles.tableCloseButton }>
               <TouchableOpacity onPress={() => toggleTable(null)} style={[styles.buttons, { backgroundColor: '#333', width: 60, height: 30, justifyContent: 'center' }]}>
                 <Text style={{ color: '#fff' }}>Close</Text>
