@@ -1,6 +1,6 @@
 import { FontAwesome6 } from '@expo/vector-icons';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, NativeTouchEvent, PanResponder, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Animated, Dimensions, ImageBackground, NativeTouchEvent, PanResponder, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Shadow } from 'react-native-shadow-2';
 import Svg, { Circle, G, Line, Path, Polyline, Text as SvgText } from 'react-native-svg';
 import routes_data from '../../assets/data/routes_data.json';
@@ -411,20 +411,43 @@ export default function MapMain() {
             
           </Svg>
         </Animated.View>
-        <Animated.View style={[styles.buttonBox, {top: 30}]}>
+        <Animated.View style={[styles.buttonBox, {right: 110}]}>
           <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: vw/1.25, vh: vh/1.25, vx: vx+0.1*vw, vy: vy+0.1*vh}));} } >
             <FontAwesome6 name="plus" size={20} color="#fff" />
           </TouchableOpacity>
         </Animated.View>
-        <Animated.View style={[styles.buttonBox, {top: 75}]}>
+        <Animated.View style={[styles.buttonBox, {right: 65}]}>
           <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: vw/0.8, vh: vh/0.8, vx: vx-0.125*vw, vy: vy-0.125*vh}));} } >
             <FontAwesome6 name="minus" size={20} color="#fff" />
           </TouchableOpacity>
         </Animated.View>
-        <Animated.View style={[styles.buttonBox, {top: 120}]}>
+        <Animated.View style={[styles.buttonBox, {right: 20}]}>
           <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: VIEW_W, vh: VIEW_H, vx: -150, vy: 170}));} } >
             <FontAwesome6 name="arrow-rotate-right" size={20} color="#fff" />
           </TouchableOpacity>
+        </Animated.View>
+        <Animated.View style={[styles.buttonBox, {left: 20, width:210}]}>
+
+          <ImageBackground style={[styles.clockBox]} source={require('../../assets/images/army.jpg')} imageStyle={{ borderRadius: 10}}>
+            <View style={styles.clock}>
+            <Text style={styles.clockTime}>
+              {(() => {
+                const now = new Date();
+                const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+                return `${time}`;
+              })()}
+            </Text>
+            <Text style={styles.clockDate}>
+              {(() => {
+                const now = new Date();
+                const month = now.toLocaleString('en-US', { month: 'short' }); // "Oct"
+                const day = now.getDate();
+                const year = now.getFullYear();
+                return `${month} ${day}, ${year}`;
+              })()}
+            </Text>  
+          </View>
+          </ImageBackground>
         </Animated.View>
       
 
@@ -481,7 +504,7 @@ const styles = StyleSheet.create({
   buttonBox: {
     position: 'absolute',
     display: 'flex',
-    right: 16,
+    top: 40,
   },
 
    openBox: {
@@ -494,6 +517,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 10,
     backgroundColor: '#1e1e1eff'
+  },
+  clockBox: {
+    width: 210,
+    height: 40,  
+    borderRadius: 10,
+    backgroundColor: '#1e1e1e1a',
+  },
+  clock: {
+    marginLeft: 10,
+    width: '40%',
+    display: 'flex',
+    alignItems: 'flex-start',
+    flex: 1,
+    justifyContent: 'center',
+  },
+
+  clockTime: {
+    lineHeight: 17,
+    color: '#fff',  
+    fontSize: 17,
+    fontWeight: '600',
+  },
+  clockDate: {
+    margin: 0, padding: 0,
+    color: '#fff',  
+    fontSize: 11,
+    fontWeight: '300',
   },
   pinchCenter: {
     width: 40,
