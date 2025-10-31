@@ -5,7 +5,9 @@ import { Shadow } from 'react-native-shadow-2';
 import Svg, { Circle, G, Line, Path, Polyline, Text as SvgText } from 'react-native-svg';
 import routes_data from '../../assets/data/routes_data.json';
 import { trackBus } from '../shared/busTrackUtils';
+import { checkHoliday } from '../shared/holidayUtils';
 import { Route, Stop } from '../shared/types/routes';
+import ButtonIsHoliday from './Buttons/buttonIsHoliday';
 import DepartingBusBlock from './DepartingBusBlock';
 import ToggleStation from './ToggleStation';
 import ToggleTable from './ToggleTable';
@@ -34,6 +36,8 @@ export default function MapMain() {
 
   const [highlightedRoute, setHighlightedRoute] = useState<string>('');
   const [selectedStation, setSelectedStation] = useState<Stop | null>(null);
+
+  const [isHoliday, setIsHoliday] = useState<boolean>(checkHoliday(new Date().getFullYear(),new Date().getMonth() + 1, new Date().getDate()));
 
   const highlightRoutes = useCallback(() => {
     routeTMC.highlighted = highlightedRoute === 'TMC';
@@ -246,9 +250,9 @@ export default function MapMain() {
                   </G>
 
 
-                  <DepartingBusBlock route={routeTMC} onPress={() => {toggleTable(routeTMC.stops[0])}}/>
-                  <DepartingBusBlock route={routeH221} onPress={() => {toggleTable(routeH221.stops[0])}}/>
-                  <DepartingBusBlock route={routeHovey} onPress={() => {toggleTable(routeHovey.stops[0])}}/>
+                  <DepartingBusBlock route={routeTMC} onPress={() => {toggleTable(routeTMC.stops[routeTMC.stops.length - 1])}}/>
+                  <DepartingBusBlock route={routeH221} onPress={() => {toggleTable(routeH221.stops[routeH221.stops.length - 1])}}/>
+                  <DepartingBusBlock route={routeHovey} onPress={() => {toggleTable(routeHovey.stops[routeHovey.stops.length - 1])}}/>
 
                   {/* Interchanges (두 번 그려 외곽선 효과: 검정 → 흰색) */}
                   <G id="interchanges">
@@ -428,7 +432,7 @@ export default function MapMain() {
         </Animated.View>
         <Animated.View style={[styles.buttonBox, {left: 20, width:210}]}>
 
-          <ImageBackground style={[styles.clockBox]} source={require('../../assets/images/army.jpg')} imageStyle={{ borderRadius: 10}}>
+          <ImageBackground style={[styles.clockBox]} source={require('../../assets/images/night.png')} imageStyle={{ borderRadius: 10}}>
             <View style={styles.clock}>
             <Text style={styles.clockTime}>
               {(() => {
@@ -449,18 +453,22 @@ export default function MapMain() {
           </View>
           </ImageBackground>
         </Animated.View>
-      
+
+        <View style={[{position:'absolute', top:85 ,right: 20}]}>
+          <ButtonIsHoliday checked={isHoliday} onChange={setIsHoliday} disabled={true} style={{ width: 130 }}/>
+        </View> 
 
         <Animated.View style={{position: 'absolute', left: 0, bottom: -45, transform: [{ translateY: offsetY }]}}>
-        <Shadow
-        startColor={isStationDetailOpened.current ? "#00000030" :"#00000000"}
-        endColor={"#00000000"}
-        distance={35}
-        offset={[0,0]}
-        >
+          <Shadow
+          startColor={isStationDetailOpened.current ? "#00000030" :"#00000000"}
+          endColor={"#00000000"}
+          distance={35}
+          offset={[0,0]}
+          >
+            
           
           <View style={styles.stationDetail} onLayout={e => setSheetH(e.nativeEvent.layout.height)}>
-            <ToggleStation selectedStation={selectedStation}/>
+            <ToggleStation selectedStation={selectedStation} isHoliday={isHoliday}/>
             <View style={ styles.stationDetailCloseButton }>
               <TouchableOpacity onPress={() => toggleSheet(null)} style={[styles.buttons, { backgroundColor: '#333', width: 60, height: 30, justifyContent: 'center' }]}>
                 <Text style={{ color: '#fff' }}>Close</Text>
@@ -469,7 +477,7 @@ export default function MapMain() {
 
           </View>
           </Shadow>
-          </Animated.View>
+        </Animated.View>
 
         <Animated.View style={{position: 'absolute', left: 0, bottom: -45, transform: [{ translateY: tableOffsetY }]}}>
         <Shadow
@@ -480,7 +488,7 @@ export default function MapMain() {
         >
           
           <View style={styles.table} onLayout={e => setTableH(e.nativeEvent.layout.height)}>
-            <ToggleTable selectedStation={selectedStation}/>
+            <ToggleTable selectedStation={selectedStation} isHoliday={isHoliday}/>
             <View style={ styles.tableCloseButton }>
               <TouchableOpacity onPress={() => toggleTable(null)} style={[styles.buttons, { backgroundColor: '#333', width: 60, height: 30, justifyContent: 'center' }]}>
                 <Text style={{ color: '#fff' }}>Close</Text>
@@ -489,7 +497,8 @@ export default function MapMain() {
 
           </View>
           </Shadow>
-          </Animated.View>
+        </Animated.View>
+
       </View>
     </>
   );
@@ -507,20 +516,18 @@ const styles = StyleSheet.create({
     top: 40,
   },
 
-   openBox: {
-    top: 24,
-  },
+
   buttons: {
     width: 40,
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
-    backgroundColor: '#1e1e1eff'
+    backgroundColor: '#343434'
   },
   clockBox: {
-    width: 210,
-    height: 40,  
+    width: 205,
+    height: 70,  
     borderRadius: 10,
     backgroundColor: '#1e1e1e1a',
   },

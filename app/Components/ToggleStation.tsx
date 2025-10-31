@@ -17,8 +17,8 @@ const [routeTMC, routeH221, routeHovey] = routes_data.routes;
 
 
 export default function ToggleStation({
-  selectedStation,
-}: { selectedStation: Stop | null; }) {
+  selectedStation, isHoliday
+}: { selectedStation: Stop | null; isHoliday: boolean; }) {
   const routeList = selectedStation  && selectedStation.intersaction3 ? [routeTMC, routeH221, routeHovey] :
                     selectedStation  && selectedStation.intersaction2 ? [routeH221, routeHovey] :
                     selectedStation  && routeTMC.stops.some(s => s.name === selectedStation.name) ? [routeTMC] :
@@ -56,8 +56,8 @@ export default function ToggleStation({
         {selectedStation?.revisit?
         routeList.map((route, idx) => {
           const nonRevistStop = route.stops.find(s => s.name === selectedStation.name && !s.revisit);
-          const label_first = getNextBusTime(route.schedule_weekdays, now, nonRevistStop?.durationFromStart || 0);
-          const label_second = getNextBusTime(route.schedule_weekdays, now, selectedStation?.durationFromStart || 0);
+          const label_first = getNextBusTime(isHoliday ? route.schedule_holidays: route.schedule_weekdays, now, nonRevistStop?.durationFromStart || 0);
+          const label_second = getNextBusTime(isHoliday ? route.schedule_holidays: route.schedule_weekdays, now, selectedStation?.durationFromStart || 0);
             return <View key={idx} style={[styles.upcomingBusBlock]}>
               <View key={idx} style={styles.busRow}>
                 <View style={styles.busButtonBox}>
@@ -78,7 +78,7 @@ export default function ToggleStation({
             </View>
         }) : 
         routeList.map((route, idx) => {
-          const label = getNextBusTime(route.schedule_weekdays, now, selectedStation?.durationFromStart || 0);
+          const label = getNextBusTime(isHoliday ? route.schedule_holidays: route.schedule_weekdays, now, selectedStation?.durationFromStart || 0);
             return <View key={idx} style={[styles.upcomingBusBlock]}>
               <View key={idx} style={styles.busRow}>
                 <View style={styles.busButtonBox}>

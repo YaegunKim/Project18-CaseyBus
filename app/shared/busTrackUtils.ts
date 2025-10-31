@@ -1,6 +1,6 @@
 import routesData from '../../assets/data/routes_data.json';
 import svgPoint from '../../assets/data/svg_data.json';
-import { isHoliday } from './holidayUtils';
+import { checkHoliday } from './holidayUtils';
 import { Route, Stop } from './types/routes';
 import { SvgPoint } from './types/svg';
 
@@ -51,7 +51,7 @@ export function trackBus(today:Date) {
 }
 
 function getRunnigBus(route:Route, today:Date): [string[], number] {
-  const todaySchedule = isHoliday(today.getFullYear(),today.getMonth() + 1, today.getDate())||[6,7].includes(today.getDay()) ? route.schedule_holidays : route.schedule_weekdays;
+  const todaySchedule = checkHoliday(today.getFullYear(),today.getMonth() + 1, today.getDate())||[6,7].includes(today.getDay()) ? route.schedule_holidays : route.schedule_weekdays;
   let currentRunningBus = [];
   let busCount = 0;
   for(let i=0; i<todaySchedule.length;i++){
