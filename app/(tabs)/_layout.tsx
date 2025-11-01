@@ -1,5 +1,4 @@
 import { Tabs } from 'expo-router';
-import React from 'react';
 
 import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
@@ -24,10 +23,44 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name='calendar'
+        options={{
+          title: 'Calendar',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name= "calendar" color={color} />,
+        }}/>
+      <Tabs.Screen
+        name='facilities'
+        options={{
+          title: 'Facilites',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name= "clock.fill" color={color} />,
+        }}/>
+      <Tabs.Screen
+        name='setting'
+        options={{
+          title: 'Setting',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name= "gear" color={color} />,
+        }}/>
+
+
+
+
+
+
+
+      <Tabs.Screen
+        name="(old)/explore"
         options={{
           title: 'Explore',
+          href: null,
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="(old)/indexExample"
+        options={{
+          title: 'Example',
+          href: null,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="dot.fill" color={color} />,
         }}
       />
     </Tabs>
