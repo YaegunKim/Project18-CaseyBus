@@ -116,7 +116,7 @@ export default function MapMain() {
       },
       onPanResponderRelease: () => {
         if (Date.now() - tapStartRef.current.t < 300) {
-          toggleSheet(null);
+          toggleSheet(null);toggleTable(null, selectedRoute);
         
         }
       }
@@ -470,7 +470,7 @@ export default function MapMain() {
             
           
           <View style={styles.stationDetail} onLayout={e => setSheetH(e.nativeEvent.layout.height)}>
-            <ToggleStation selectedStation={selectedStation} isHoliday={isHoliday}/>
+            <ToggleStation selectedStation={selectedStation} isHoliday={isHoliday} onOpenTable={(station, route) => toggleTable(station, route)}/>
             <View style={ styles.stationDetailCloseButton }>
               <TouchableOpacity onPress={() => toggleSheet(null)} style={[styles.buttons, { backgroundColor: '#333', width: 60, height: 30, justifyContent: 'center' }]}>
                 <Text style={{ color: '#fff' }}>Close</Text>
