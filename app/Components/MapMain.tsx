@@ -1,8 +1,8 @@
 import { FontAwesome6 } from '@expo/vector-icons';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Modal, Animated, Dimensions, ImageBackground, NativeTouchEvent, PanResponder, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Animated, Dimensions, ImageBackground, Modal, NativeTouchEvent, PanResponder, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Shadow } from 'react-native-shadow-2';
-import Svg, { Circle, G, Line, Path, Polyline, Text as SvgText, Rect} from 'react-native-svg';
+import Svg, { Circle, G, Line, Path, Polyline, Rect, Text as SvgText } from 'react-native-svg';
 import routes_data from '../../assets/data/routes_data.json';
 import { trackBus } from '../shared/busTrackUtils';
 import { checkHoliday } from '../shared/holidayUtils';
@@ -34,18 +34,13 @@ function getCenterLocationY(touches: NativeTouchEvent[]){
 
 export default function MapMain() {
 
-  const [highlightedRoute, setHighlightedRoute] = useState<string>('');
   const [selectedStation, setSelectedStation] = useState<Stop | null>(null);
   const [selectedRoute, setSelectedRoute] = useState<Route>(routeTMC);
   const pinScale = useRef(new Animated.Value(0)).current;
   const [isHoliday, setIsHoliday] = useState<boolean>(checkHoliday(new Date().getFullYear(),new Date().getMonth() + 1, new Date().getDate()));
   const [showInitialWarning, setShowInitialWarning] = useState(true);
 
-  const highlightRoutes = useCallback(() => {
-    routeTMC.highlighted = highlightedRoute === 'TMC';
-    routeH221.highlighted = highlightedRoute === 'H221';
-    routeHovey.highlighted = highlightedRoute === 'Hovey';
-  }, [highlightedRoute]);
+
 
   useEffect(() => {
     if (selectedStation) {
@@ -59,10 +54,7 @@ export default function MapMain() {
     }
   }, [selectedStation]);
 
-  // ensure highlights sync when state changes
-  useEffect(() => {
-    highlightRoutes();
-  }, [highlightRoutes]);
+
 
   // Pan을 위한 state/ref
   const [{vx,vy,vw,vh}, setVB] = useState({ vx: -150, vy: 170, vw: VIEW_W, vh: VIEW_H });
