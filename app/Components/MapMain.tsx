@@ -17,7 +17,6 @@ const VIEW_H = Dimensions.get('window').height;
 const [routeTMC, routeH221, routeHovey] = routes_data.routes;
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-
 function getDistance(touches: NativeTouchEvent[]){
   const [touch1 , touch2] = touches;
   return Math.sqrt((touch1.locationX-touch2.locationX)**2+(touch1.locationY-touch2.locationY));
