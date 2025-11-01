@@ -2,7 +2,7 @@ import { FontAwesome6 } from '@expo/vector-icons';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, ImageBackground, NativeTouchEvent, PanResponder, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Shadow } from 'react-native-shadow-2';
-import Svg, { Circle, G, Line, Path, Polyline, Text as SvgText } from 'react-native-svg';
+import Svg, { Circle, G, Line, Path, Polyline, Text as SvgText, Rect} from 'react-native-svg';
 import routes_data from '../../assets/data/routes_data.json';
 import { trackBus } from '../shared/busTrackUtils';
 import { checkHoliday } from '../shared/holidayUtils';
@@ -15,7 +15,7 @@ import ToggleTable from './ToggleTable';
 const VIEW_W = Dimensions.get('window').width;
 const VIEW_H = Dimensions.get('window').height;
 const [routeTMC, routeH221, routeHovey] = routes_data.routes;
-
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 function getDistance(touches: NativeTouchEvent[]){
   const [touch1 , touch2] = touches;
@@ -37,7 +37,7 @@ export default function MapMain() {
   const [highlightedRoute, setHighlightedRoute] = useState<string>('');
   const [selectedStation, setSelectedStation] = useState<Stop | null>(null);
   const [selectedRoute, setSelectedRoute] = useState<Route>(routeTMC);
-
+  const pinScale = useRef(new Animated.Value(0)).current;
   const [isHoliday, setIsHoliday] = useState<boolean>(checkHoliday(new Date().getFullYear(),new Date().getMonth() + 1, new Date().getDate()));
 
   const highlightRoutes = useCallback(() => {
@@ -45,6 +45,18 @@ export default function MapMain() {
     routeH221.highlighted = highlightedRoute === 'H221';
     routeHovey.highlighted = highlightedRoute === 'Hovey';
   }, [highlightedRoute]);
+
+    useEffect(() => {
+    if (selectedStation) {
+      pinScale.setValue(0);
+      Animated.spring(pinScale, {
+        toValue:1,
+        useNativeDriver: false,
+        friction:4,
+        tension:60,
+      }).start();
+    }
+  }, [selectedStation]);
 
   // ensure highlights sync when state changes
   useEffect(() => {
@@ -414,7 +426,41 @@ export default function MapMain() {
                     )
                   })}
 
-            
+            {selectedStation && (
+  <>
+  <Rect
+      x={selectedStation.x - 45}      // left padding
+      y={selectedStation.y - 33}      // above the circle
+      width={90}                      // box width
+      height={20}                     // box height
+      fill="white"                    // background color
+      stroke="black"                  // border color
+      strokeWidth={1.5}
+      rx={4}                          // rounded corners
+    />
+  <SvgText
+      x={selectedStation.x}
+      y={selectedStation.y - 18}   // position above circle
+      fontSize={12}
+      fill="black"
+      fontWeight="bold"
+      textAnchor="middle"
+    >
+      You are here!
+    </SvgText>
+    <AnimatedCircle
+    cx={selectedStation.x}
+    cy={selectedStation.y}
+    r={pinScale.interpolate({
+      inputRange: [0, 1],
+      outputRange: [6, 15],   // grows from small to bigger
+    })}
+    fill="black"
+    stroke="black"
+    strokeWidth={1}
+  />
+  </>
+)}
           </Svg>
         </Animated.View>
         <Animated.View style={[styles.buttonBox, {right: 110}]}>
