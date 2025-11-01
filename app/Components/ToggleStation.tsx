@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import routes_data from '../../assets/data/routes_data.json';
 import { getNextBusTime } from "../shared/busTrackUtils";
 import { Stop } from '../shared/types/routes';
@@ -17,8 +17,8 @@ const [routeTMC, routeH221, routeHovey] = routes_data.routes;
 
 
 export default function ToggleStation({
-  selectedStation, isHoliday
-}: { selectedStation: Stop | null; isHoliday: boolean; }) {
+  selectedStation, isHoliday, onOpenTable
+}: { selectedStation: Stop | null; isHoliday: boolean; onOpenTable: (station: Stop | null, route: any) => void; }) {
   const routeList = selectedStation  && selectedStation.intersaction3 ? [routeTMC, routeH221, routeHovey] :
                     selectedStation  && selectedStation.intersaction2 ? [routeH221, routeHovey] :
                     selectedStation  && routeTMC.stops.some(s => s.name === selectedStation.name) ? [routeTMC] :
@@ -70,10 +70,14 @@ export default function ToggleStation({
                   )}
                 </View>
 
-                <View style={styles.busLabelBox}>
+                <Pressable
+                    style={styles.busLabelBox}
+                    onPress={() => onOpenTable?.(selectedStation, route)} // ✅ 콜백 호출
+                    hitSlop={6}
+                  >
                   <Text style={styles.busLabelText}>{label_first[2]}</Text>
                   <Text style={styles.busLabelText}>{label_second[2]}</Text>
-                </View>
+                </Pressable>
               </View>
             </View>
         }) : 
@@ -91,9 +95,13 @@ export default function ToggleStation({
                   )}
                 </View>
 
-                <View>
+                <Pressable
+                    style={styles.busLabelBox}
+                    onPress={() => onOpenTable?.(selectedStation, route)} // ✅ 콜백 호출
+                    hitSlop={6}
+                  >
                   <Text >{label[2]}</Text>
-                </View>
+                </Pressable>
               </View>
             </View>
         })}          

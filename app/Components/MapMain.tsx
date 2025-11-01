@@ -1,6 +1,6 @@
 import { FontAwesome6 } from '@expo/vector-icons';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, ImageBackground, NativeTouchEvent, PanResponder, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Modal, Animated, Dimensions, ImageBackground, NativeTouchEvent, PanResponder, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Shadow } from 'react-native-shadow-2';
 import Svg, { Circle, G, Line, Path, Polyline, Text as SvgText, Rect} from 'react-native-svg';
 import routes_data from '../../assets/data/routes_data.json';
@@ -39,6 +39,7 @@ export default function MapMain() {
   const [selectedRoute, setSelectedRoute] = useState<Route>(routeTMC);
   const pinScale = useRef(new Animated.Value(0)).current;
   const [isHoliday, setIsHoliday] = useState<boolean>(checkHoliday(new Date().getFullYear(),new Date().getMonth() + 1, new Date().getDate()));
+  const [showInitialWarning, setShowInitialWarning] = useState(true);
 
   const highlightRoutes = useCallback(() => {
     routeTMC.highlighted = highlightedRoute === 'TMC';
@@ -46,7 +47,7 @@ export default function MapMain() {
     routeHovey.highlighted = highlightedRoute === 'Hovey';
   }, [highlightedRoute]);
 
-    useEffect(() => {
+  useEffect(() => {
     if (selectedStation) {
       pinScale.setValue(0);
       Animated.spring(pinScale, {
@@ -128,7 +129,7 @@ export default function MapMain() {
       },
       onPanResponderRelease: () => {
         if (Date.now() - tapStartRef.current.t < 300) {
-          toggleSheet(null);
+          toggleSheet(null);toggleTable(null, selectedRoute);
         
         }
       }
@@ -205,6 +206,47 @@ export default function MapMain() {
 
   return (
     <>
+    <Modal
+  visible={showInitialWarning}
+  transparent={true}
+  animationType="fade"
+  onRequestClose={() => setShowInitialWarning(false)}
+>
+  <View style={{
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.4)',
+  }}>
+    <View style={{
+      width: 300,
+      padding: 20,
+      backgroundColor: 'white',
+      borderRadius: 10,
+      alignItems: 'center',
+    }}>
+      <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>
+        ⚠️ Notice
+      </Text>
+      <Text style={{ fontSize: 14, textAlign: 'center', marginBottom: 20 }}>
+        Bus times may not be accurate. Please check with the station if needed.
+      </Text>
+      <TouchableOpacity
+        onPress={() => setShowInitialWarning(false)}
+        style={{
+          paddingVertical: 8,
+          paddingHorizontal: 20,
+          backgroundColor: '#0345fc',
+          borderRadius: 5,
+        }}
+      >
+        <Text style={{ color: 'white', fontWeight: 'bold' }}>Close</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
+
+
       <View style={{width: VIEW_W, height:VIEW_H-90}}>
         <Animated.View style={styles.box} {...pan.panHandlers}>
           <Svg width={VIEW_W} height={VIEW_H} viewBox={`${vx} ${vy} ${vw} ${vh}`}>
@@ -426,7 +468,7 @@ export default function MapMain() {
                     )
                   })}
 
-            {selectedStation && (
+{selectedStation && (
   <>
   <Rect
       x={selectedStation.x - 45}      // left padding
@@ -461,6 +503,9 @@ export default function MapMain() {
   />
   </>
 )}
+
+
+            
           </Svg>
         </Animated.View>
         <Animated.View style={[styles.buttonBox, {right: 110}]}>
@@ -516,9 +561,9 @@ export default function MapMain() {
             
           
           <View style={styles.stationDetail} onLayout={e => setSheetH(e.nativeEvent.layout.height)}>
-            <ToggleStation selectedStation={selectedStation} isHoliday={isHoliday}/>
+            <ToggleStation selectedStation={selectedStation} isHoliday={isHoliday} onOpenTable={(station, route) => toggleTable(station, route)}/>
             <View style={ styles.stationDetailCloseButton }>
-              <TouchableOpacity onPress={() => toggleSheet(null)} style={[styles.buttons, { backgroundColor: '#333', width: 60, height: 30, justifyContent: 'center' }]}>
+              <TouchableOpacity onPress={() => {toggleSheet(null); toggleTable(null,routeTMC);}} style={[styles.buttons, { backgroundColor: '#333', width: 60, height: 30, justifyContent: 'center' }]}>
                 <Text style={{ color: '#fff' }}>Close</Text>
               </TouchableOpacity>
             </View>
@@ -536,9 +581,9 @@ export default function MapMain() {
         >
           
           <View style={styles.table} onLayout={e => setTableH(e.nativeEvent.layout.height)}>
-            <ToggleTable selectedStation={selectedStation} selectedRoute={selectedRoute} isHoliday={isHoliday}/>
+                        <ToggleTable selectedStation={selectedStation} selectedRoute={selectedRoute} isHoliday={isHoliday}/>
             <View style={ styles.tableCloseButton }>
-              <TouchableOpacity onPress={() => toggleTable(null, routeTMC)} style={[styles.buttons, { backgroundColor: '#333', width: 60, height: 30, justifyContent: 'center' }]}>
+              <TouchableOpacity onPress={() => {toggleSheet(null); toggleTable(null,routeTMC);}} style={[styles.buttons, { backgroundColor: '#333', width: 60, height: 30, justifyContent: 'center' }]}>
                 <Text style={{ color: '#fff' }}>Close</Text>
               </TouchableOpacity>
             </View>
