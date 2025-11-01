@@ -37,6 +37,7 @@ export default function MapMain() {
 
   const [highlightedRoute, setHighlightedRoute] = useState<string>('');
   const [selectedStation, setSelectedStation] = useState<Stop | null>(null);
+  const [selectedRoute, setSelectedRoute] = useState<Route>(routeTMC);
   const pinScale = useRef(new Animated.Value(0)).current;
   const [isHoliday, setIsHoliday] = useState<boolean>(checkHoliday(new Date().getFullYear(),new Date().getMonth() + 1, new Date().getDate()));
 
@@ -169,9 +170,10 @@ export default function MapMain() {
 
 
   const toggleTable = useCallback(
-    (station: Stop | null) => {
+    (station: Stop | null, route: Route) => {
       const openWindow = station !== null;
       setSelectedStation(station);
+      setSelectedRoute(route);
       isTableOpened.current = openWindow;
 
       const h = tableH || VIEW_H;
@@ -263,9 +265,9 @@ export default function MapMain() {
                   </G>
 
 
-                  <DepartingBusBlock route={routeTMC} onPress={() => {toggleTable(routeTMC.stops[routeTMC.stops.length - 1])}}/>
-                  <DepartingBusBlock route={routeH221} onPress={() => {toggleTable(routeH221.stops[routeH221.stops.length - 1])}}/>
-                  <DepartingBusBlock route={routeHovey} onPress={() => {toggleTable(routeHovey.stops[routeHovey.stops.length - 1])}}/>
+                  <DepartingBusBlock route={routeTMC} onPress={() => {toggleTable(routeTMC.stops[routeTMC.stops.length - 1], routeTMC)}}/>
+                  <DepartingBusBlock route={routeH221} onPress={() => {toggleTable(routeH221.stops[routeH221.stops.length - 1], routeH221)}}/>
+                  <DepartingBusBlock route={routeHovey} onPress={() => {toggleTable(routeHovey.stops[routeHovey.stops.length - 1], routeHovey)}}/>
 
                   {/* Interchanges (두 번 그려 외곽선 효과: 검정 → 흰색) */}
                   <G id="interchanges">
@@ -538,9 +540,9 @@ export default function MapMain() {
         >
           
           <View style={styles.table} onLayout={e => setTableH(e.nativeEvent.layout.height)}>
-            <ToggleTable selectedStation={selectedStation} isHoliday={isHoliday}/>
+                        <ToggleTable selectedStation={selectedStation} selectedRoute={selectedRoute} isHoliday={isHoliday}/>
             <View style={ styles.tableCloseButton }>
-              <TouchableOpacity onPress={() => toggleTable(null)} style={[styles.buttons, { backgroundColor: '#333', width: 60, height: 30, justifyContent: 'center' }]}>
+              <TouchableOpacity onPress={() => toggleTable(null, routeTMC)} style={[styles.buttons, { backgroundColor: '#333', width: 60, height: 30, justifyContent: 'center' }]}>
                 <Text style={{ color: '#fff' }}>Close</Text>
               </TouchableOpacity>
             </View>
