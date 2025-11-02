@@ -1,4 +1,5 @@
 import { FontAwesome6 } from '@expo/vector-icons';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, ImageBackground, Modal, NativeTouchEvent, PanResponder, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Shadow } from 'react-native-shadow-2';
@@ -11,7 +12,6 @@ import ButtonIsHoliday from './Buttons/buttonIsHoliday';
 import DepartingBusBlock from './DepartingBusBlock';
 import ToggleStation from './ToggleStation';
 import ToggleTable from './ToggleTable';
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const VIEW_W = Dimensions.get('window').width;
 const VIEW_H = Dimensions.get('window').height;
@@ -238,7 +238,8 @@ export default function MapMain() {
       </Text>
 
       <Text style={{ fontSize: 14, textAlign: 'center', marginBottom: 20 }}>
-        Bus times may not be accurate. Please check with the station if needed.
+        {/* Bus times may not be accurate. Please check with the station if needed. */}
+        Bus movement information in this app is estimated based on the fixed timetable. The actual bus location may differ from the displayed position. Please use the arrival times and locations for reference only.
       </Text>
 
       {/* Close Only */}
