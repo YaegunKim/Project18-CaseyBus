@@ -11,6 +11,7 @@ import ButtonIsHoliday from './Buttons/buttonIsHoliday';
 import DepartingBusBlock from './DepartingBusBlock';
 import ToggleStation from './ToggleStation';
 import ToggleTable from './ToggleTable';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const VIEW_W = Dimensions.get('window').width;
 const VIEW_H = Dimensions.get('window').height;
@@ -40,6 +41,21 @@ export default function MapMain() {
   const [isHoliday, setIsHoliday] = useState<boolean>(checkHoliday(new Date().getFullYear(),new Date().getMonth() + 1, new Date().getDate()));
   const [showInitialWarning, setShowInitialWarning] = useState(true);
 
+  // Effect for don't show warning for one day
+  useEffect(() => {
+    const checkWarning = async() => {
+      const stored = await AsyncStorage.getItem("hideWarningUntil");
+      if (!stored) {
+        setShowInitialWarning(true);
+        return;
+      }
+      const now = Date.now();
+      if (now > Number(stored)) {
+        setShowInitialWarning(true);
+      }
+    };
+    checkWarning();
+  }, []);
 
 
   useEffect(() => {
@@ -220,20 +236,46 @@ export default function MapMain() {
       <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>
         ⚠️ Notice
       </Text>
+
       <Text style={{ fontSize: 14, textAlign: 'center', marginBottom: 20 }}>
         Bus times may not be accurate. Please check with the station if needed.
       </Text>
+
+      {/* Close Only */}
       <TouchableOpacity
         onPress={() => setShowInitialWarning(false)}
         style={{
           paddingVertical: 8,
           paddingHorizontal: 20,
-          backgroundColor: '#0345fc',
+          backgroundColor: '#666',
           borderRadius: 5,
+          marginBottom: 10,
+          width: '100%',
+          alignItems: 'center',
         }}
       >
         <Text style={{ color: 'white', fontWeight: 'bold' }}>Close</Text>
       </TouchableOpacity>
+
+      {/* Close for 1 day */}
+      <TouchableOpacity
+        onPress={async () => {
+          const oneDayLater = Date.now() + 24 * 60 * 60 * 1000;
+          await AsyncStorage.setItem("hideWarningUntil", String(oneDayLater));
+          setShowInitialWarning(false);
+        }}
+        style={{
+          paddingVertical: 8,
+          paddingHorizontal: 20,
+          backgroundColor: '#0345fc',
+          borderRadius: 5,
+          width: '100%',
+          alignItems: 'center',
+        }}
+      >
+        <Text style={{ color: 'white', fontWeight: 'bold' }}>Don’t show for 1 day</Text>
+      </TouchableOpacity>
+
     </View>
   </View>
 </Modal>
