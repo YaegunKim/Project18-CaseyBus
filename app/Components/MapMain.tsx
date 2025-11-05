@@ -1,7 +1,7 @@
 import { FontAwesome6 } from '@expo/vector-icons';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, ImageBackground, Modal, NativeTouchEvent, PanResponder, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Animated, Dimensions, Modal, NativeTouchEvent, PanResponder, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Shadow } from 'react-native-shadow-2';
 import Svg, { Circle, G, Line, Path, Polyline, Rect, Text as SvgText } from 'react-native-svg';
 import routes_data from '../../assets/data/routes_data.json';
@@ -283,7 +283,7 @@ export default function MapMain() {
 
 
       <View style={{width: VIEW_W, height:VIEW_H-90}}>
-        <Animated.View style={styles.box} {...pan.panHandlers}>
+        <Animated.View style={[styles.box, {backgroundColor: '#F7F9FC'}]} {...pan.panHandlers}>
           <Svg width={VIEW_W} height={VIEW_H} viewBox={`${vx} ${vy} ${vw} ${vh}`}>
                   <G id="route-TMC">
                     <Polyline
@@ -544,23 +544,50 @@ export default function MapMain() {
           </Svg>
         </Animated.View>
         <Animated.View style={[styles.buttonBox, {right: 110}]}>
+          <Shadow
+          startColor={"#00000015"}
+          endColor={"#00000000"}
+          distance={15}
+          >
+          
           <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: vw/1.25, vh: vh/1.25, vx: vx+0.1*vw, vy: vy+0.1*vh}));} } >
-            <FontAwesome6 name="plus" size={20} color="#fff" />
+            
+            <FontAwesome6 name="plus" size={15} color="black" />
+            
           </TouchableOpacity>
+          </Shadow>
+          
         </Animated.View>
         <Animated.View style={[styles.buttonBox, {right: 65}]}>
+          <Shadow
+          startColor={"#00000015"}
+          endColor={"#00000000"}
+          distance={15}
+          >
           <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: vw/0.8, vh: vh/0.8, vx: vx-0.125*vw, vy: vy-0.125*vh}));} } >
-            <FontAwesome6 name="minus" size={20} color="#fff" />
+            <FontAwesome6 name="minus" size={15} color="black" />
           </TouchableOpacity>
+          </Shadow>
         </Animated.View>
         <Animated.View style={[styles.buttonBox, {right: 20}]}>
+          <Shadow
+          startColor={"#00000015"}
+          endColor={"#00000000"}
+          distance={15}
+          >
           <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: VIEW_W, vh: VIEW_H, vx: -150, vy: 170}));} } >
-            <FontAwesome6 name="arrow-rotate-right" size={20} color="#fff" />
+            <FontAwesome6 name="arrow-rotate-right" size={15} color="black" />
           </TouchableOpacity>
+          </Shadow>
         </Animated.View>
-        <Animated.View style={[styles.buttonBox, {left: 20, width:210}]}>
-
-          <ImageBackground style={[styles.clockBox]} source={require('../../assets/images/night.png')} imageStyle={{ borderRadius: 10}}>
+        <Animated.View style={[styles.buttonBox, {left: 20, width:150}]}>
+       
+          <Shadow
+          startColor={"#00000015"}
+          endColor={"#00000000"}
+          distance={15}
+          >
+            <View style={[styles.buttonBox,{top: 0, width:150, backgroundColor: "#fff", height: 70, borderRadius: 10}]}>
             <View style={styles.clock}>
             <Text style={styles.clockTime}>
               {(() => {
@@ -579,11 +606,20 @@ export default function MapMain() {
               })()}
             </Text>  
           </View>
-          </ImageBackground>
+          </View>
+          
+          </Shadow>
         </Animated.View>
 
         <View style={[{position:'absolute', top:85 ,right: 20}]}>
+          <Shadow
+          startColor={"#00000015"}
+          endColor={"#00000000"}
+          distance={15}
+          style={{borderRadius: 20}}
+          >
           <ButtonIsHoliday checked={isHoliday} onChange={setIsHoliday} disabled={true} style={{ width: 130 }}/>
+          </Shadow>
         </View> 
 
         <Animated.View style={{position: 'absolute', left: 0, bottom: -45, transform: [{ translateY: offsetY }]}}>
@@ -650,8 +686,8 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 10,
-    backgroundColor: '#343434'
+    borderRadius: 20,
+    backgroundColor: '#fff'
   },
   clockBox: {
     width: 205,
@@ -670,13 +706,13 @@ const styles = StyleSheet.create({
 
   clockTime: {
     lineHeight: 17,
-    color: '#fff',  
+    color: 'black',  
     fontSize: 17,
     fontWeight: '600',
   },
   clockDate: {
     margin: 0, padding: 0,
-    color: '#fff',  
+    color: 'black',  
     fontSize: 11,
     fontWeight: '300',
   },

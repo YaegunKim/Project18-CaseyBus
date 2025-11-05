@@ -45,11 +45,12 @@ export default function ButtonIsHoliday({
   const dark = "#343434";
   const leftTextColor = anim.interpolate({
     inputRange: [0, 1],
-    outputRange: [dark, "#ffffff"], 
+    outputRange: ["#fff", dark],
   });
   const rightTextColor = anim.interpolate({
     inputRange: [0, 1],
-    outputRange: ["#ffffff", dark],
+    outputRange: [dark, "#fff"], 
+    
   });
 
   return (
@@ -95,29 +96,21 @@ const styles = StyleSheet.create({
   },
   container: {
     position: "relative",
-    borderWidth: 3,
-    borderColor: "#343434",
+    borderWidth: 2,
     borderRadius: 10,
-    backgroundColor: "#343434", // 웹과 동일
+    borderColor: "#fff",
     overflow: "hidden",
   },
   bg: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "#343434",
-    borderRadius: 20,
+    borderRadius: 50,
   },
   slider: {
     position: "absolute",
     left: 0,
     top: 0,
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    // 약간의 입체감
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
+    backgroundColor: "#343434",
+    borderRadius: 0,
   },
   row: {
     // grid(2열) 대신 flex 두 칸
@@ -125,8 +118,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   cellText: {
+    height: 20,
     flex: 1,
     textAlign: "center",
+    lineHeight: 20,
+    fontSize: 10,
     fontWeight: "bold",
   },
 });
