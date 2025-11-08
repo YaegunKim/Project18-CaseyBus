@@ -283,7 +283,7 @@ export default function MapMain() {
 
 
       <View style={{width: VIEW_W, height:VIEW_H-90}}>
-        <Animated.View style={[styles.box, {backgroundColor: '#F7F9FC'}]} {...pan.panHandlers}>
+        <Animated.View style={[styles.box, {backgroundColor: '#f5f7f6'}]} {...pan.panHandlers}>
           <Svg width={VIEW_W} height={VIEW_H} viewBox={`${vx} ${vy} ${vw} ${vh}`}>
                   <G id="route-TMC">
                     <Polyline
@@ -510,8 +510,8 @@ export default function MapMain() {
       y={selectedStation.y - 33}      // above the circle
       width={90}                      // box width
       height={20}                     // box height
-      fill="white"                    // background color
-      stroke="black"                  // border color
+      fill="#2b2b2bff"                    // background color
+      stroke="#2b2b2bff"                  // border color
       strokeWidth={1.5}
       rx={4}                          // rounded corners
     />
@@ -519,7 +519,7 @@ export default function MapMain() {
       x={selectedStation.x}
       y={selectedStation.y - 18}   // position above circle
       fontSize={12}
-      fill="black"
+      fill="white"
       fontWeight="bold"
       textAnchor="middle"
     >
@@ -530,11 +530,11 @@ export default function MapMain() {
     cy={selectedStation.y}
     r={pinScale.interpolate({
       inputRange: [0, 1],
-      outputRange: [6, 15],   // grows from small to bigger
+      outputRange: [6, 10],   // grows from small to bigger
     })}
-    fill="black"
-    stroke="black"
-    strokeWidth={1}
+    fill="#2b2b2bff"
+    stroke="white"
+    strokeWidth={3}
   />
   </>
 )}
@@ -545,9 +545,9 @@ export default function MapMain() {
         </Animated.View>
         <Animated.View style={[styles.buttonBox, {right: 110}]}>
           <Shadow
-          startColor={"#00000015"}
+          startColor={"#00000010"}
           endColor={"#00000000"}
-          distance={15}
+          distance={10}
           >
           
           <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: vw/1.25, vh: vh/1.25, vx: vx+0.1*vw, vy: vy+0.1*vh}));} } >
@@ -560,9 +560,9 @@ export default function MapMain() {
         </Animated.View>
         <Animated.View style={[styles.buttonBox, {right: 65}]}>
           <Shadow
-          startColor={"#00000015"}
+          startColor={"#00000010"}
           endColor={"#00000000"}
-          distance={15}
+          distance={10}
           >
           <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: vw/0.8, vh: vh/0.8, vx: vx-0.125*vw, vy: vy-0.125*vh}));} } >
             <FontAwesome6 name="minus" size={15} color="black" />
@@ -571,9 +571,9 @@ export default function MapMain() {
         </Animated.View>
         <Animated.View style={[styles.buttonBox, {right: 20}]}>
           <Shadow
-          startColor={"#00000015"}
+          startColor={"#00000010"}
           endColor={"#00000000"}
-          distance={15}
+          distance={10}
           >
           <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: VIEW_W, vh: VIEW_H, vx: -150, vy: 170}));} } >
             <FontAwesome6 name="arrow-rotate-right" size={15} color="black" />
@@ -583,9 +583,9 @@ export default function MapMain() {
         <Animated.View style={[styles.buttonBox, {left: 20, width:150}]}>
        
           <Shadow
-          startColor={"#00000015"}
+          startColor={"#00000010"}
           endColor={"#00000000"}
-          distance={15}
+          distance={10}
           >
             <View style={[styles.buttonBox,{top: 0, width:150, backgroundColor: "#fff", height: 70, borderRadius: 10}]}>
             <View style={styles.clock}>
@@ -624,9 +624,9 @@ export default function MapMain() {
 
         <Animated.View style={{position: 'absolute', left: 0, bottom: -45, transform: [{ translateY: offsetY }]}}>
           <Shadow
-          startColor={isStationDetailOpened.current ? "#00000030" :"#00000000"}
+          startColor={isStationDetailOpened.current ? "#00000010" :"#00000000"}
           endColor={"#00000000"}
-          distance={35}
+          distance={10}
           offset={[0,0]}
           >
             
@@ -645,9 +645,9 @@ export default function MapMain() {
 
         <Animated.View style={{position: 'absolute', left: 0, bottom: -45, transform: [{ translateY: tableOffsetY }]}}>
         <Shadow
-        startColor={isTableOpened.current ? "#00000030" :"#00000000"}
+        startColor={isTableOpened.current ? "#00000010" :"#00000000"}
         endColor={"#00000000"}
-        distance={35}
+        distance={10}
         offset={[0,0]}
         >
           
