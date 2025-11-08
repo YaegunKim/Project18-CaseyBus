@@ -78,12 +78,12 @@ export default function DepartingBusBlock({
         </SvgText>
         <SvgText
             x={-100} y={Cy}
-            fontSize={18}
+            fontSize={16}
             fontWeight="500">
         {nextBus ? nextBus[1] : 'No more today'}
         </SvgText>
         <SvgText
-            x={-52} y={Cy-2}
+            x={-55} y={Cy-2}
             fontSize={8}
             fontWeight="500">
         ({nextBus ? nextBus[2] : 'No more today'})
