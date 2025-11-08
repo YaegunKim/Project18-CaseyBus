@@ -4,6 +4,9 @@ import { Shadow } from 'react-native-shadow-2';
 
 const VIEW_H = Dimensions.get('window').height;
 
+
+
+
 export default function Facilities() {
   return (
     <ScrollView style={styles.container}>
@@ -17,6 +20,23 @@ export default function Facilities() {
             <FontAwesome6 name="burger" size={52} color="#e53935" style={styles.InfoLogo}/>
             <Text style={styles.InfoTitle}>DFAC</Text>
             <Text style={styles.InfoDetail}>Main l Thunder l Argonne l Hovey</Text>
+        </View>
+        </Shadow>
+      </View>
+      <View style={[styles.InfoBox, {backgroundColor: '#e6e6e6ff', height: 90}]}>
+        <Shadow
+                  startColor={"#00000010"}
+                  endColor={"#00000000"}
+                  distance={5}
+                  >
+        <View style={[styles.InfoBoxInner, {backgroundColor: '#e6e6e6ff', height: 90}]}>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', top: 5, left: 80, fontWeight: 400}]}>Weekdays</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', top: 5, left: 210, fontWeight: 400}]}>Holidays</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', fontSize: 12, top: 30, left: 37}]}>Breakfast : 0730~0900</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', fontSize: 12, top: 47.5, left: 55}]}>Lunch : 1130~1300</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', fontSize: 12, top: 65, left: 53}]}>Dinner : 1700~1830</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', fontSize: 12, top: 37, left: 195}]}>Brunch : 0930~1300</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', fontSize: 12, top: 55, left: 195}]}>Dinner : 1700~1830</Text>
         </View>
         </Shadow>
       </View>
