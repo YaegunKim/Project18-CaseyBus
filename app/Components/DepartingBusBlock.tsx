@@ -23,9 +23,9 @@ export default function DepartingBusBlock({
                route == routeH221 ? 560 :
                640;
 
-    const Color = route == routeTMC ? "#0345fc" :
-                  route == routeH221 ? "#009623" :
-                  "#ff2a00";
+    const Color = route == routeTMC ? "#1976d2" :
+                  route == routeH221 ? "#4caf50" :
+                  "#e53935";
 
 
     const [tick, setTick] = useState(0);

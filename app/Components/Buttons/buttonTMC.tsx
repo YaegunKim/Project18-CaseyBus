@@ -6,7 +6,7 @@ const ButtonTMC = () => {
     const router = useRouter();
   return (
     <View style={{paddingRight: 5}}>
-      <TouchableOpacity style={[styles.button, { backgroundColor: '#0345fc' }]} onPress={() => router.push('/Components/MinimapTMC')}>
+      <TouchableOpacity style={[styles.button, { backgroundColor: '#1976d2' }]} onPress={() => router.push('/Components/MinimapTMC')}>
         <FontAwesome6 name="bus-simple" size={12} color="#fff" style={{ paddingRight: 5 }}/>
         <Text style={styles.text}>TMC</Text>
       </TouchableOpacity>
