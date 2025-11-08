@@ -268,7 +268,7 @@ export default function MapMain() {
         style={{
           paddingVertical: 8,
           paddingHorizontal: 20,
-          backgroundColor: '#0345fc',
+          backgroundColor: '#1976d2',
           borderRadius: 5,
           width: '100%',
           alignItems: 'center',
@@ -288,7 +288,7 @@ export default function MapMain() {
                   <G id="route-TMC">
                     <Polyline
                       fill="none"
-                      stroke= {routeH221.highlighted || routeHovey.highlighted ? "#0345fc80" : "#0345fc"}
+                      stroke= {routeH221.highlighted || routeHovey.highlighted ? "#1976d280" : "#1976d2"}
                       strokeWidth={5.5}
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -309,7 +309,7 @@ export default function MapMain() {
                   <G id="route-H221">
                     <Polyline
                       fill="none"
-                      stroke= {(routeTMC.highlighted || routeHovey.highlighted) ? "#00962380" : "#009623"}
+                      stroke= {(routeTMC.highlighted || routeHovey.highlighted) ? "#4caf5080" : "#4caf50"}
                       strokeWidth={5.5}
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -325,7 +325,7 @@ export default function MapMain() {
                   <G id="route-HOVEY">
                     <Polyline
                       fill="none"
-                      stroke= {routeTMC.highlighted || routeH221.highlighted ? "#ff2a0080" : "#ff2a00"}
+                      stroke= {routeTMC.highlighted || routeH221.highlighted ? "#e5393580" : "#e53935"}
                       strokeWidth={5.5}
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -383,10 +383,10 @@ export default function MapMain() {
                         <Circle cx={station.x}  cy={station.y}
                                 r={(station.intersaction3 || station.intersaction2)? 3 : 1.5}
                                 fill={
-                                        station.intersaction3 ? (routeTMC.highlighted || routeH221.highlighted ? "#ff2a0050" : "#ff2a00")
-                                          : station.intersaction2 && routeH221.highlighted ? "#ff2a0050"
+                                        station.intersaction3 ? (routeTMC.highlighted || routeH221.highlighted ? "#e5393550" : "#e53935")
+                                          : station.intersaction2 && routeH221.highlighted ? "#e5393550"
                                             : station.intersaction2
-                                              ? "#ff2a00"
+                                              ? "#e53935"
                                               : "white"
                                       } />
                         <Circle cx={station.x}  cy={station.y}
@@ -404,10 +404,10 @@ export default function MapMain() {
                         <Circle cx={station.x}  cy={station.y}
                                 r={(station.intersaction3 || station.intersaction2)? 3 : 1.5}
                                 fill={
-                                        station.intersaction3 ? (routeTMC.highlighted || routeHovey.highlighted ? "#00962350" : "#009623")
-                                          : station.intersaction2 && routeHovey.highlighted ? "#00962350"
+                                        station.intersaction3 ? (routeTMC.highlighted || routeHovey.highlighted ? "#4caf5050" : "#4caf50")
+                                          : station.intersaction2 && routeHovey.highlighted ? "#4caf5050"
                                             : station.intersaction2
-                                              ? "#009623"
+                                              ? "#4caf50"
                                               : "white"
                                       } />
                         <Circle cx={station.x}  cy={station.y}
@@ -424,7 +424,7 @@ export default function MapMain() {
                       <G key={`tmc-${index}`}>
                         <Circle cx={station.x}  cy={station.y}
                                 r={station.intersaction3? 3 : 1.5}
-                                fill={station.intersaction3? (routeH221.highlighted || routeHovey.highlighted? "#0345fc50" : "#0345fc") : "white"}
+                                fill={station.intersaction3? (routeH221.highlighted || routeHovey.highlighted? "#1976d250" : "#1976d2") : "white"}
                                 />
                         <Circle cx={station.x}  cy={station.y}
                                 r={20}
@@ -491,10 +491,10 @@ export default function MapMain() {
                     return(
                       <G key={`bus-${index}`} x={item[1][0]-10} y={item[1][1]-10} scale={20 / 576}>
                         <Path d="M192 64C139 64 96 107 96 160L96 448C96 477.8 116.4 502.9 144 510L144 544C144 561.7 158.3 576 176 576L192 576C209.7 576 224 561.7 224 544L224 512L416 512L416 544C416 561.7 430.3 576 448 576L464 576C481.7 576 496 561.7 496 544L496 510C523.6 502.9 544 477.8 544 448L544 160C544 107 501 64 448 64L192 64zM160 240C160 222.3 174.3 208 192 208L296 208L296 320L192 320C174.3 320 160 305.7 160 288L160 240zM344 320L344 208L448 208C465.7 208 480 222.3 480 240L480 288C480 305.7 465.7 320 448 320L344 320zM192 384C209.7 384 224 398.3 224 416C224 433.7 209.7 448 192 448C174.3 448 160 433.7 160 416C160 398.3 174.3 384 192 384zM448 384C465.7 384 480 398.3 480 416C480 433.7 465.7 448 448 448C430.3 448 416 433.7 416 416C416 398.3 430.3 384 448 384zM248 136C248 122.7 258.7 112 272 112L368 112C381.3 112 392 122.7 392 136C392 149.3 381.3 160 368 160L272 160C258.7 160 248 149.3 248 136z"
-                          fill={item[0] == routeTMC?"#0345fc":(item[0] == routeH221?"#009623": "#ff2a00")}
+                          fill={item[0] == routeTMC?"#1976d2":(item[0] == routeH221?"#4caf50": "#e53935")}
                         />
                         <Path d="M192 64C139 64 96 107 96 160L96 448C96 477.8 116.4 502.9 144 510L144 544C144 561.7 158.3 576 176 576L192 576C209.7 576 224 561.7 224 544L224 512L416 512L416 544C416 561.7 430.3 576 448 576L464 576C481.7 576 496 561.7 496 544L496 510C523.6 502.9 544 477.8 544 448L544 160C544 107 501 64 448 64L192 64zM160 240C160 222.3 174.3 208 192 208L296 208L296 320L192 320C174.3 320 160 305.7 160 288L160 240zM344 320L344 208L448 208C465.7 208 480 222.3 480 240L480 288C480 305.7 465.7 320 448 320L344 320zM192 384C209.7 384 224 398.3 224 416C224 433.7 209.7 448 192 448C174.3 448 160 433.7 160 416C160 398.3 174.3 384 192 384zM448 384C465.7 384 480 398.3 480 416C480 433.7 465.7 448 448 448C430.3 448 416 433.7 416 416C416 398.3 430.3 384 448 384zM248 136C248 122.7 258.7 112 272 112L368 112C381.3 112 392 122.7 392 136C392 149.3 381.3 160 368 160L272 160C258.7 160 248 149.3 248 136z"
-                          fill={item[0] == routeTMC?"#0345fc":(item[0] == routeH221?"#009623": "#ff2a00")}
+                          fill={item[0] == routeTMC?"#1976d2":(item[0] == routeH221?"#4caf50": "#e53935")}
                           stroke="#ffffffff"
                           strokeWidth={30}
                         />

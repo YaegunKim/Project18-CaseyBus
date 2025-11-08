@@ -2,17 +2,20 @@ import { FontAwesome6 } from '@expo/vector-icons';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, NativeTouchEvent, PanResponder, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Shadow } from 'react-native-shadow-2';
-import Svg, { Circle, G, Line, Path, Polyline, Text as SvgText } from 'react-native-svg';
+import Svg, { Circle, G, Line, Path, Polyline, Rect, Text as SvgText } from 'react-native-svg';
 import routes_data from '../../assets/data/routes_data.json';
 import { trackBus } from '../shared/busTrackUtils';
+import { checkHoliday } from '../shared/holidayUtils';
 import { Route, Stop } from '../shared/types/routes';
+import ButtonIsHoliday from './Buttons/buttonIsHoliday';
 import DepartingBusBlock from './DepartingBusBlock';
 import ToggleStation from './ToggleStation';
+import ToggleTable from './ToggleTable';
 
 const VIEW_W = Dimensions.get('window').width;
 const VIEW_H = Dimensions.get('window').height;
 const [routeTMC, routeH221, routeHovey] = routes_data.routes;
-
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 function getDistance(touches: NativeTouchEvent[]){
   const [touch1 , touch2] = touches;
@@ -31,19 +34,27 @@ function getCenterLocationY(touches: NativeTouchEvent[]){
 
 export default function MinimapH221() {
 
-  const [highlightedRoute, setHighlightedRoute] = useState<string>('');
   const [selectedStation, setSelectedStation] = useState<Stop | null>(null);
+  const [selectedRoute, setSelectedRoute] = useState<Route>(routeTMC);
+  const pinScale = useRef(new Animated.Value(0)).current;
+  const [isHoliday, setIsHoliday] = useState<boolean>(checkHoliday(new Date().getFullYear(),new Date().getMonth() + 1, new Date().getDate()));
+  const [showInitialWarning, setShowInitialWarning] = useState(true);
 
-  const highlightRoutes = useCallback(() => {
-    routeTMC.highlighted = highlightedRoute === 'TMC';
-    routeH221.highlighted = highlightedRoute === 'H221';
-    routeHovey.highlighted = highlightedRoute === 'Hovey';
-  }, [highlightedRoute]);
 
-  // ensure highlights sync when state changes
+
   useEffect(() => {
-    highlightRoutes();
-  }, [highlightRoutes]);
+    if (selectedStation) {
+      pinScale.setValue(0);
+      Animated.spring(pinScale, {
+        toValue:1,
+        useNativeDriver: false,
+        friction:4,
+        tension:60,
+      }).start();
+    }
+  }, [selectedStation]);
+
+
 
   // Pan을 위한 state/ref
   const [{vx,vy,vw,vh}, setVB] = useState({ vx: -150, vy: 170, vw: VIEW_W, vh: VIEW_H });
@@ -110,7 +121,7 @@ export default function MinimapH221() {
       },
       onPanResponderRelease: () => {
         if (Date.now() - tapStartRef.current.t < 300) {
-          toggleSheet(null);
+          toggleSheet(null);toggleTable(null, selectedRoute);
         
         }
       }
@@ -142,6 +153,34 @@ export default function MinimapH221() {
     },
     [offsetY, sheetH]
   );
+
+
+    //schedule window
+  const [tableH, setTableH] = useState<number>(0);
+  const tableOffsetY = useRef(new Animated.Value(VIEW_H)).current; // 열린 상태 기준 0
+  const isTableOpened = useRef(false);
+
+
+  const toggleTable = useCallback(
+    (station: Stop | null, route: Route) => {
+      const openWindow = station !== null;
+      setSelectedStation(station);
+      setSelectedRoute(route);
+      isTableOpened.current = openWindow;
+
+      const h = tableH || VIEW_H;
+
+      Animated.spring(tableOffsetY, {
+        toValue: openWindow ? 0 : h,
+        useNativeDriver: true,
+        damping: 100,
+        stiffness: 180,
+        mass: 0.8,
+        overshootClamping: true,
+      }).start();
+    },
+    [tableOffsetY, tableH]
+  );
   
   // const [runningBuses, setRunnigBuses] = useState(trackBus());
   const [tick, setTick] = useState(0);
@@ -160,13 +199,13 @@ export default function MinimapH221() {
   return (
     <>
       <View style={{width: VIEW_W, height:VIEW_H-90}}>
-        <Animated.View style={styles.box} {...pan.panHandlers}>
+        <Animated.View style={[styles.box, {backgroundColor: '#f5f7f6'}]} {...pan.panHandlers}>
           <Svg width={VIEW_W} height={VIEW_H} viewBox={`${vx} ${vy} ${vw} ${vh}`}>
                                
                   <G id="route-H221">
                     <Polyline
                       fill="none"
-                      stroke= {(routeTMC.highlighted || routeHovey.highlighted) ? "#00962380" : "#009623"}
+                      stroke= {(routeTMC.highlighted || routeHovey.highlighted) ? "#4caf5080" : "#4caf50"}
                       strokeWidth={5.5}
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -181,7 +220,7 @@ export default function MinimapH221() {
 
 
 
-                  <DepartingBusBlock route={routeH221}/>
+                  <DepartingBusBlock route={routeH221} onPress={() => {toggleTable(routeH221.stops[routeH221.stops.length - 1], routeH221)}}/>
 
                   {/* Interchanges (두 번 그려 외곽선 효과: 검정 → 흰색) */}
                   <G id="interchanges">
@@ -215,17 +254,16 @@ export default function MinimapH221() {
                   </G>
             
                   {/* Dots */}
-
                   {routeH221.stops.map((station:Stop, index) => {
                     return(
                       <G key={`h221-${index}`}>
                         <Circle cx={station.x}  cy={station.y}
                                 r={(station.intersaction3 || station.intersaction2)? 3 : 1.5}
                                 fill={
-                                        station.intersaction3 ? (routeTMC.highlighted || routeHovey.highlighted ? "#00962350" : "#009623")
-                                          : station.intersaction2 && routeHovey.highlighted ? "#00962350"
+                                        station.intersaction3 ? (routeTMC.highlighted || routeHovey.highlighted ? "#4caf5050" : "#4caf50")
+                                          : station.intersaction2 && routeHovey.highlighted ? "#4caf5050"
                                             : station.intersaction2
-                                              ? "#009623"
+                                              ? "#4caf50"
                                               : "white"
                                       } />
                         <Circle cx={station.x}  cy={station.y}
@@ -240,9 +278,7 @@ export default function MinimapH221() {
 
 
 
-
                   {/* text */}
-
 
                   
                   {routeH221.stops.map((station:Stop, index) => {
@@ -260,17 +296,16 @@ export default function MinimapH221() {
                   })}
 
 
-
                   {/* Buses */}
                     {runningBuses.map((item:[Route,number[]], index) => {
-                      if(item[0] != routeH221) return null;
+                      if (item[0] !== routeH221) return null
                     return(
                       <G key={`bus-${index}`} x={item[1][0]-10} y={item[1][1]-10} scale={20 / 576}>
                         <Path d="M192 64C139 64 96 107 96 160L96 448C96 477.8 116.4 502.9 144 510L144 544C144 561.7 158.3 576 176 576L192 576C209.7 576 224 561.7 224 544L224 512L416 512L416 544C416 561.7 430.3 576 448 576L464 576C481.7 576 496 561.7 496 544L496 510C523.6 502.9 544 477.8 544 448L544 160C544 107 501 64 448 64L192 64zM160 240C160 222.3 174.3 208 192 208L296 208L296 320L192 320C174.3 320 160 305.7 160 288L160 240zM344 320L344 208L448 208C465.7 208 480 222.3 480 240L480 288C480 305.7 465.7 320 448 320L344 320zM192 384C209.7 384 224 398.3 224 416C224 433.7 209.7 448 192 448C174.3 448 160 433.7 160 416C160 398.3 174.3 384 192 384zM448 384C465.7 384 480 398.3 480 416C480 433.7 465.7 448 448 448C430.3 448 416 433.7 416 416C416 398.3 430.3 384 448 384zM248 136C248 122.7 258.7 112 272 112L368 112C381.3 112 392 122.7 392 136C392 149.3 381.3 160 368 160L272 160C258.7 160 248 149.3 248 136z"
-                          fill="#009623"
+                          fill={item[0] == routeTMC?"#1976d2":(item[0] == routeH221?"#4caf50": "#e53935")}
                         />
                         <Path d="M192 64C139 64 96 107 96 160L96 448C96 477.8 116.4 502.9 144 510L144 544C144 561.7 158.3 576 176 576L192 576C209.7 576 224 561.7 224 544L224 512L416 512L416 544C416 561.7 430.3 576 448 576L464 576C481.7 576 496 561.7 496 544L496 510C523.6 502.9 544 477.8 544 448L544 160C544 107 501 64 448 64L192 64zM160 240C160 222.3 174.3 208 192 208L296 208L296 320L192 320C174.3 320 160 305.7 160 288L160 240zM344 320L344 208L448 208C465.7 208 480 222.3 480 240L480 288C480 305.7 465.7 320 448 320L344 320zM192 384C209.7 384 224 398.3 224 416C224 433.7 209.7 448 192 448C174.3 448 160 433.7 160 416C160 398.3 174.3 384 192 384zM448 384C465.7 384 480 398.3 480 416C480 433.7 465.7 448 448 448C430.3 448 416 433.7 416 416C416 398.3 430.3 384 448 384zM248 136C248 122.7 258.7 112 272 112L368 112C381.3 112 392 122.7 392 136C392 149.3 381.3 160 368 160L272 160C258.7 160 248 149.3 248 136z"
-                          fill="#009623"
+                          fill={item[0] == routeTMC?"#1976d2":(item[0] == routeH221?"#4caf50": "#e53935")}
                           stroke="#ffffffff"
                           strokeWidth={30}
                         />
@@ -279,45 +314,166 @@ export default function MinimapH221() {
                     )
                   })}
 
+{selectedStation && (
+  <>
+  <Rect
+      x={selectedStation.x - 45}      // left padding
+      y={selectedStation.y - 33}      // above the circle
+      width={90}                      // box width
+      height={20}                     // box height
+      fill="#2b2b2bff"                    // background color
+      stroke="#2b2b2bff"                  // border color
+      strokeWidth={1.5}
+      rx={4}                          // rounded corners
+    />
+  <SvgText
+      x={selectedStation.x}
+      y={selectedStation.y - 18}   // position above circle
+      fontSize={12}
+      fill="white"
+      fontWeight="bold"
+      textAnchor="middle"
+    >
+      You are here!
+    </SvgText>
+    <AnimatedCircle
+    cx={selectedStation.x}
+    cy={selectedStation.y}
+    r={pinScale.interpolate({
+      inputRange: [0, 1],
+      outputRange: [6, 10],   // grows from small to bigger
+    })}
+    fill="#2b2b2bff"
+    stroke="white"
+    strokeWidth={3}
+  />
+  </>
+)}
+
+
             
           </Svg>
         </Animated.View>
-        <Animated.View style={[styles.buttonBox, {top: 30}]}>
+        <Animated.View style={[styles.buttonBox, {right: 110}]}>
+          <Shadow
+          startColor={"#00000010"}
+          endColor={"#00000000"}
+          distance={10}
+          >
+          
           <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: vw/1.25, vh: vh/1.25, vx: vx+0.1*vw, vy: vy+0.1*vh}));} } >
-            <FontAwesome6 name="plus" size={20} color="#fff" />
+            
+            <FontAwesome6 name="plus" size={15} color="black" />
+            
           </TouchableOpacity>
+          </Shadow>
+          
         </Animated.View>
-        <Animated.View style={[styles.buttonBox, {top: 75}]}>
+        <Animated.View style={[styles.buttonBox, {right: 65}]}>
+          <Shadow
+          startColor={"#00000010"}
+          endColor={"#00000000"}
+          distance={10}
+          >
           <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: vw/0.8, vh: vh/0.8, vx: vx-0.125*vw, vy: vy-0.125*vh}));} } >
-            <FontAwesome6 name="minus" size={20} color="#fff" />
+            <FontAwesome6 name="minus" size={15} color="black" />
           </TouchableOpacity>
+          </Shadow>
         </Animated.View>
-        <Animated.View style={[styles.buttonBox, {top: 120}]}>
+        <Animated.View style={[styles.buttonBox, {right: 20}]}>
+          <Shadow
+          startColor={"#00000010"}
+          endColor={"#00000000"}
+          distance={10}
+          >
           <TouchableOpacity style={styles.buttons} onPress={() => {setVB(v => ({...v, vw: VIEW_W, vh: VIEW_H, vx: -150, vy: 170}));} } >
-            <FontAwesome6 name="arrow-rotate-right" size={20} color="#fff" />
+            <FontAwesome6 name="arrow-rotate-right" size={15} color="black" />
           </TouchableOpacity>
+          </Shadow>
         </Animated.View>
-      
+        <Animated.View style={[styles.buttonBox, {left: 20, width:150}]}>
+       
+          <Shadow
+          startColor={"#00000010"}
+          endColor={"#00000000"}
+          distance={10}
+          >
+            <View style={[styles.buttonBox,{top: 0, width:150, backgroundColor: "#fff", height: 70, borderRadius: 10}]}>
+            <View style={styles.clock}>
+            <Text style={styles.clockTime}>
+              {(() => {
+                const now = new Date();
+                const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+                return `${time}`;
+              })()}
+            </Text>
+            <Text style={styles.clockDate}>
+              {(() => {
+                const now = new Date();
+                const month = now.toLocaleString('en-US', { month: 'short' }); // "Oct"
+                const day = now.getDate();
+                const year = now.getFullYear();
+                return `${month} ${day}, ${year}`;
+              })()}
+            </Text>  
+          </View>
+          </View>
+          
+          </Shadow>
+        </Animated.View>
+
+        <View style={[{position:'absolute', top:85 ,right: 20}]}>
+          <Shadow
+          startColor={"#00000015"}
+          endColor={"#00000000"}
+          distance={15}
+          style={{borderRadius: 20}}
+          >
+          <ButtonIsHoliday checked={isHoliday} onChange={setIsHoliday} disabled={true} style={{ width: 130 }}/>
+          </Shadow>
+        </View> 
 
         <Animated.View style={{position: 'absolute', left: 0, bottom: -45, transform: [{ translateY: offsetY }]}}>
-        <Shadow
-        startColor={isStationDetailOpened.current ? "#00000030" :"#00000000"}
-        endColor={"#00000000"}
-        distance={35}
-        offset={[0,0]}
-        >
+          <Shadow
+          startColor={isStationDetailOpened.current ? "#00000010" :"#00000000"}
+          endColor={"#00000000"}
+          distance={10}
+          offset={[0,0]}
+          >
+            
           
           <View style={styles.stationDetail} onLayout={e => setSheetH(e.nativeEvent.layout.height)}>
-            <ToggleStation selectedStation={selectedStation}/>
+            <ToggleStation selectedStation={selectedStation} isHoliday={isHoliday} onOpenTable={(station, route) => toggleTable(station, route)}/>
             <View style={ styles.stationDetailCloseButton }>
-              <TouchableOpacity onPress={() => toggleSheet(null)} style={[styles.buttons, { backgroundColor: '#333', width: 60, height: 30, justifyContent: 'center' }]}>
+              <TouchableOpacity onPress={() => {toggleSheet(null); toggleTable(null,routeTMC);}} style={[styles.buttons, { backgroundColor: '#333', width: 60, height: 30, justifyContent: 'center' }]}>
                 <Text style={{ color: '#fff' }}>Close</Text>
               </TouchableOpacity>
             </View>
 
           </View>
           </Shadow>
-          </Animated.View>
+        </Animated.View>
+
+        <Animated.View style={{position: 'absolute', left: 0, bottom: -45, transform: [{ translateY: tableOffsetY }]}}>
+        <Shadow
+        startColor={isTableOpened.current ? "#00000010" :"#00000000"}
+        endColor={"#00000000"}
+        distance={10}
+        offset={[0,0]}
+        >
+          
+          <View style={styles.table} onLayout={e => setTableH(e.nativeEvent.layout.height)}>
+                        <ToggleTable selectedStation={selectedStation} selectedRoute={selectedRoute} isHoliday={isHoliday}/>
+            <View style={ styles.tableCloseButton }>
+              <TouchableOpacity onPress={() => {toggleSheet(null); toggleTable(null,routeTMC);}} style={[styles.buttons, { backgroundColor: '#333', width: 60, height: 30, justifyContent: 'center' }]}>
+                <Text style={{ color: '#fff' }}>Close</Text>
+              </TouchableOpacity>
+            </View>
+
+          </View>
+          </Shadow>
+        </Animated.View>
+
       </View>
     </>
   );
@@ -332,19 +488,44 @@ const styles = StyleSheet.create({
   buttonBox: {
     position: 'absolute',
     display: 'flex',
-    right: 16,
+    top: 40,
   },
 
-   openBox: {
-    top: 24,
-  },
+
   buttons: {
     width: 40,
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 20,
+    backgroundColor: '#fff'
+  },
+  clockBox: {
+    width: 205,
+    height: 70,  
     borderRadius: 10,
-    backgroundColor: '#1e1e1eff'
+    backgroundColor: '#1e1e1e1a',
+  },
+  clock: {
+    marginLeft: 10,
+    width: '40%',
+    display: 'flex',
+    alignItems: 'flex-start',
+    flex: 1,
+    justifyContent: 'center',
+  },
+
+  clockTime: {
+    lineHeight: 17,
+    color: 'black',  
+    fontSize: 17,
+    fontWeight: '600',
+  },
+  clockDate: {
+    margin: 0, padding: 0,
+    color: 'black',  
+    fontSize: 11,
+    fontWeight: '300',
   },
   pinchCenter: {
     width: 40,
@@ -375,6 +556,27 @@ const styles = StyleSheet.create({
     // elevation: 30,
   },
   stationDetailCloseButton: {
+    top: 10, right:10,
+    position: 'absolute',
+    borderRadius: 10,
+    padding: 6
+  },
+    table: {
+    padding: 0,
+    width: VIEW_W,
+    height: VIEW_H - 75,
+    backgroundColor: '#ffffffff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    // iOS shadow
+    // shadowColor: '#000000ff',
+    // shadowOffset: { width: 20, height: 20 },
+    // shadowOpacity: 1,
+    // shadowRadius: 20,
+    // Android shadow
+    // elevation: 30,
+  },
+  tableCloseButton: {
     top: 10, right:10,
     position: 'absolute',
     borderRadius: 10,

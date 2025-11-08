@@ -6,7 +6,7 @@ const ButtonHovey = () => {
     const router = useRouter();
   return (
     <View style={{paddingRight: 5}}>
-        <TouchableOpacity style={[styles.button, { backgroundColor: '#ff2a00' }]} onPress={() => router.push('/Components/MinimapHovey')}>
+        <TouchableOpacity style={[styles.button, { backgroundColor: '#e53935' }]} onPress={() => router.push('/Components/MinimapHovey')}>
             <FontAwesome6 name="bus-simple" size={12} color="#fff" style={{ paddingRight: 5 }}/>
             <Text style={styles.text}>Hovey</Text>
         </TouchableOpacity>
