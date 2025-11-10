@@ -245,7 +245,6 @@ export default function Facilities() {
         </Shadow>
       </View>
       )}
-
       <View style={[styles.InfoBox, {backgroundColor: 'transparent', height: 60}]}>
         
       </View>
