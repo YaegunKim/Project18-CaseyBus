@@ -11,6 +11,10 @@ export default function Facilities() {
   const [InfoTime_DFAC, setInfoTime_DFAC] = useState<boolean>(false);
   const [InfoTime_KSB, setInfoTime_KSB] = useState<boolean>(false);
   const [InfoTime_BarberShop, setInfoTime_BarborShop] = useState<boolean>(false);
+  const [InfoTime_GYM, setInfoTime_GYM] = useState<boolean>(false);
+  const [InfoTime_CAC, setInfoTime_CAC] = useState<boolean>(false);
+  const [InfoTime_USO, setInfoTime_USO] = useState<boolean>(false);
+  const [InfoTime_Library, setInfoTime_Library] = useState<boolean>(false);
 
   return (
     <ScrollView style={styles.container}>
@@ -73,11 +77,11 @@ export default function Facilities() {
         <View style={[styles.InfoBoxInner, {backgroundColor: '#e6e6e6ff', height: 120}]}>
             <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', top: 5, left: 132, fontWeight: 400}]}>Weekdays</Text>
             <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', top: 5, left: 241, fontWeight: 400}]}>Holidays</Text>
-            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', fontSize: 12, top: 30, left: 45}]}>Canteen :            1100~1900                  Random</Text>
-            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', fontSize: 12, top: 45, left: 45}]}>Thunder :            1100~1900                  Random</Text>
-            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', fontSize: 12, top: 60, left: 51}]}>Shortie :            1100~1900                  Random</Text>
-            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', fontSize: 12, top: 75, left: 10, width: 'auto'}]}>Drangon Valley :            1100~1900                  Random</Text>
-            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', fontSize: 12, top: 90, left: 56}]}>Hovey :            1100~1900                  Random</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', fontSize: 12, top: 30, left: 45, width: 300}]}>Canteen :            1100~1900                  Random</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', fontSize: 12, top: 45, left: 45, width: 300}]}>Thunder :            1100~1900                  Random</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', fontSize: 12, top: 60, left: 51, width: 300}]}>Shortie :            1100~1900                  Random</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', fontSize: 12, top: 75, left: 10, width: 300}]}>Drangon Valley :            1100~1900                  Random</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', fontSize: 12, top: 90, left: 56, width: 300}]}>Hovey :            1100~1900                  Random</Text>
         </View>
         </Shadow>
       </View>
@@ -105,17 +109,17 @@ export default function Facilities() {
                   distance={5}
                   >
         <View style={[styles.InfoBoxInner, {backgroundColor: '#e6e6e6ff', height: 90}]}>
-            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', top: 15, left: 100, fontWeight: 500}]}>MON-FRI</Text>
-            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', top: 35, left: 130, fontWeight: 500}]}>SAT</Text>
-            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', top: 55, left: 129, fontWeight: 500}]}>SUN</Text>
-            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', fontSize: 12, top: 15, left: 200}]}>1000 - 1900</Text>
-            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', fontSize: 12, top: 35, left: 200}]}>1000 - 1800</Text>
-            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', fontSize: 12, top: 55, left: 200}]}>1000 - 1900</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', top: 15, left: 110, fontWeight: 500}]}>MON-FRI</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', top: 35, left: 140, fontWeight: 500}]}>SAT</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', top: 55, left: 139, fontWeight: 500}]}>SUN</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', fontSize: 12, top: 15, left: 180}]}>1000 - 1900</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', fontSize: 12, top: 35, left: 180}]}>1000 - 1800</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', fontSize: 12, top: 55, left: 180}]}>1000 - 1900</Text>
         </View>
         </Shadow>
       </View>
       )}
-      <View style={[styles.InfoBox]}>
+      <TouchableOpacity style={[styles.InfoBox]} onPress={() => {setInfoTime_GYM(!InfoTime_GYM)}}>
         <Shadow
                   startColor={"#00000010"}
                   endColor={"#00000000"}
@@ -129,8 +133,26 @@ export default function Facilities() {
             </View>
         </View>
         </Shadow>
+      </TouchableOpacity>
+      {InfoTime_GYM && (
+      <View style={[styles.InfoBox, {backgroundColor: '#e6e6e6ff', height: 90, marginTop: 10}]}>
+        <Shadow
+                  startColor={"#00000010"}
+                  endColor={"#00000000"}
+                  distance={5}
+                  >
+        <View style={[styles.InfoBoxInner, {backgroundColor: '#e6e6e6ff', height: 90}]}>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', top: 15, left: 110, fontWeight: 500}]}>MON-FRI</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', top: 35, left: 140, fontWeight: 500}]}>SAT</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', top: 55, left: 139, fontWeight: 500}]}>SUN</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', fontSize: 12, top: 15, left: 180}]}>TBD</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', fontSize: 12, top: 35, left: 180}]}>TBD</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', fontSize: 12, top: 55, left: 180}]}>TBD</Text>
+        </View>
+        </Shadow>
       </View>
-      <View style={[styles.InfoBox]}>
+      )}
+      <TouchableOpacity style={[styles.InfoBox]} onPress={() => {setInfoTime_CAC(!InfoTime_CAC)}}>
         <Shadow
                   startColor={"#00000010"}
                   endColor={"#00000000"}
@@ -144,8 +166,55 @@ export default function Facilities() {
             </View>
         </View>
         </Shadow>
+      </TouchableOpacity>
+      {InfoTime_CAC && (
+      <View style={[styles.InfoBox, {backgroundColor: '#e6e6e6ff', height: 70, marginTop: 10}]}>
+        <Shadow
+                  startColor={"#00000010"}
+                  endColor={"#00000000"}
+                  distance={5}
+                  >
+        <View style={[styles.InfoBoxInner, {backgroundColor: '#e6e6e6ff', height: 70}]}>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', top: 15, left: 110, fontWeight: 500}]}>MON-SAT</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', top: 35, left: 140, fontWeight: 500}]}>SUN</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', fontSize: 12, top: 15, left: 180}]}>0900 - 2100</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', fontSize: 12, top: 35, left: 180}]}>1000 - 1900</Text>
+        </View>
+        </Shadow>
       </View>
-      <View style={[styles.InfoBox]}>
+      )}
+      <TouchableOpacity style={[styles.InfoBox]} onPress={() => {setInfoTime_USO(!InfoTime_USO)}}>
+        <Shadow
+                  startColor={"#00000010"}
+                  endColor={"#00000000"}
+                  distance={5}
+                  >
+        <View style={[styles.InfoBoxInner]}>
+            <FontAwesome6 name="rocket" size={55} color="#5575f7ff" style={styles.InfoLogo}/>
+            <View style={styles.InfoText}>
+              <Text style={styles.InfoTitle}>USO</Text>
+              <Text style={styles.InfoDetail}>Casey</Text>
+            </View>
+        </View>
+        </Shadow>
+      </TouchableOpacity>
+      {InfoTime_USO && (
+      <View style={[styles.InfoBox, {backgroundColor: '#e6e6e6ff', height: 70, marginTop: 10}]}>
+        <Shadow
+                  startColor={"#00000010"}
+                  endColor={"#00000000"}
+                  distance={5}
+                  >
+        <View style={[styles.InfoBoxInner, {backgroundColor: '#e6e6e6ff', height: 70}]}>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', top: 15, left: 110, fontWeight: 500}]}>MON-SAT</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', top: 35, left: 140, fontWeight: 500}]}>SUN</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', fontSize: 12, top: 15, left: 180}]}>0900 - 1800</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', fontSize: 12, top: 35, left: 180}]}>1000 - 1700</Text>
+        </View>
+        </Shadow>
+      </View>
+      )}
+      <TouchableOpacity style={[styles.InfoBox]} onPress={() => {setInfoTime_Library(!InfoTime_Library)}}>
         <Shadow
                   startColor={"#00000010"}
                   endColor={"#00000000"}
@@ -159,7 +228,24 @@ export default function Facilities() {
             </View>
         </View>
         </Shadow>
+      </TouchableOpacity>
+      {InfoTime_Library && (
+      <View style={[styles.InfoBox, {backgroundColor: '#e6e6e6ff', height: 70, marginTop: 10}]}>
+        <Shadow
+                  startColor={"#00000010"}
+                  endColor={"#00000000"}
+                  distance={5}
+                  >
+        <View style={[styles.InfoBoxInner, {backgroundColor: '#e6e6e6ff', height: 70}]}>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', top: 15, left: 110, fontWeight: 500}]}>MON-SAT</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', top: 35, left: 140, fontWeight: 500}]}>SUN</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', fontSize: 12, top: 15, left: 180}]}>1000 - 1900</Text>
+            <Text style={[styles.InfoDetail, {color: '#4b4b4bff', position: 'absolute', fontSize: 12, top: 35, left: 180}]}>Closed</Text>
+        </View>
+        </Shadow>
       </View>
+      )}
+
       <View style={[styles.InfoBox, {backgroundColor: 'transparent', height: 60}]}>
         
       </View>
