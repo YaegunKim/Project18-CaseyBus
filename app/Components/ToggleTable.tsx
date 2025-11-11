@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import routes_data from '../../assets/data/routes_data.json';
-import { addMinutesToTimes } from '../shared/busTrackUtils';
+import { addMinutesToTimes, getNextBusTime } from '../shared/busTrackUtils';
 import { Route, Stop } from "../shared/types/routes";
 import ButtonH221 from './Buttons/buttonH221';
 import ButtonHovey from './Buttons/buttonHovey';
@@ -20,6 +20,7 @@ type Props = {
 
 export default function ToggleTable({ selectedStation, selectedRoute, isHoliday }: Props) {
   const [isHolidayLocal, setIsHolidayLocal] = useState<boolean>(isHoliday);
+  const scrollRef = useRef<ScrollView>(null); // 👈 스크롤뷰 참조
 
   
   const nonRevisitStop = useMemo(
@@ -64,6 +65,45 @@ export default function ToggleTable({ selectedStation, selectedRoute, isHoliday 
     return addMinutesToTimes(baseSchedule, inboundOffsetMin);
   }, [baseSchedule, inboundOffsetMin, selectedStation]);
 
+  const [tick, setTick] = useState(0);
+    useEffect(() => {
+    const id = setInterval(() => setTick(t => t + 1), 1000); // 1초마다
+    return () => clearInterval(id);
+    }, []);
+  
+  const now = React.useMemo(() => new Date(), [tick]);
+
+
+  const nextBusTimeOutbound = useMemo(() => {
+    return scheduleListOutbound ? getNextBusTime(scheduleListOutbound, now, 0)[1] : null;
+  }, [tick, scheduleListOutbound, now]);
+  const nextBusTimeInbound = useMemo(() => {
+    return scheduleListInbound ? getNextBusTime(scheduleListInbound, now, 0)[1] : null;
+  }, [tick, scheduleListInbound, now]);
+  const nextBusTimeSingleSchedule = useMemo(() => {
+    return singleSchedule ? getNextBusTime(singleSchedule, now, 0)[1] : null;
+  }, [tick, singleSchedule, now]);
+
+
+    // 🧭 스크롤 위치 자동 이동
+  useEffect(() => {
+    const scrollToNext = (scheduleList: string[] | null, target: string | null) => {
+      if (!scheduleList || !target) return;
+      const idx = scheduleList.findIndex(time => time === target);
+      if (idx >= 0 && scrollRef.current) {
+        const itemHeight = 50; // styles.timeBlock.height
+        const scrollY = itemHeight * idx - 300; // 가운데쯤 오게 조정
+        scrollRef.current.scrollTo({ y: Math.max(scrollY, 0), animated: true });
+      }
+    };
+
+    if (selectedStation?.revisit) {
+      scrollToNext(scheduleListOutbound, nextBusTimeOutbound);
+    } else {
+      scrollToNext(singleSchedule, nextBusTimeSingleSchedule);
+    }
+  }, [nextBusTimeOutbound, nextBusTimeSingleSchedule, selectedStation]);
+
   return (
     <View>
       <View style={styles.titleBox}>
@@ -89,7 +129,7 @@ export default function ToggleTable({ selectedStation, selectedRoute, isHoliday 
         </View>
       )}
 
-      <ScrollView style={{ maxHeight: 600 }}>
+      <ScrollView ref={scrollRef} style={{ maxHeight: 600 }}>
         {selectedStation?.revisit && scheduleListOutbound && scheduleListInbound ? (
           
           (scheduleListOutbound.length > scheduleListInbound.length
@@ -100,15 +140,15 @@ export default function ToggleTable({ selectedStation, selectedRoute, isHoliday 
             const labelSecond = scheduleListInbound?.[idx] ?? '';
             return (
               <View key={idx} style={styles.timeBlock}>
-                <Text style={styles.time}>{labelFirst}</Text>
-                <Text style={styles.time}>{labelSecond}</Text>
+                <Text style={[styles.time, {backgroundColor: (labelFirst === nextBusTimeOutbound)? '#eeeeeeff' : 'transparent'}]}>{labelFirst}</Text>
+                <Text style={[styles.time, {backgroundColor: (labelSecond === nextBusTimeInbound)? '#eeeeeeff' : 'transparent'}]}>{labelSecond}</Text>
               </View>
             );
           })
         ) : (
           // 단방향(리비짓 아님)
           singleSchedule?.map((time, idx) => (
-            <View key={idx} style={styles.timeBlock}>
+            <View key={idx} style={[styles.timeBlock, {backgroundColor: (time === nextBusTimeSingleSchedule)? '#eeeeeeff' : 'transparent'}]}>
               <Text style={[styles.time, { width: '100%' }]}>{time}</Text>
             </View>
           ))
