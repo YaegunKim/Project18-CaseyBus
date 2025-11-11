@@ -2,14 +2,14 @@ import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Tabs } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
+import { StatusBar } from 'react-native';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
     <>
-    <StatusBar style="dark"/>
+    <StatusBar barStyle="dark-content"/>
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: '#343434ff',

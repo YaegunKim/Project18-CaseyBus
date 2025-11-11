@@ -697,11 +697,12 @@ const styles = StyleSheet.create({
   },
   clock: {
     marginLeft: 10,
-    width: '40%',
+    width: '100%',
     display: 'flex',
     alignItems: 'flex-start',
     flex: 1,
     justifyContent: 'center',
+
   },
 
   clockTime: {
