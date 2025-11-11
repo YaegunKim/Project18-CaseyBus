@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import routes_data from '../../assets/data/routes_data.json';
+import { addMinutesToTimes } from '../shared/busTrackUtils';
 import { Route, Stop } from "../shared/types/routes";
 import ButtonH221 from './Buttons/buttonH221';
 import ButtonHovey from './Buttons/buttonHovey';
@@ -15,15 +16,7 @@ type Props = {
   isHoliday: boolean;
 };
 
-function addMinutesToTimes(times: string[], offsetMin: number): string[] {
-  return times.map((time) => {
-    const [h, m] = time.split(':').map(Number);
-    const total = h * 60 + m + (offsetMin || 0);
-    const hh = ((Math.floor(total / 60) % 24) + 24) % 24; // 음수 방지
-    const mm = ((total % 60) + 60) % 60;
-    return `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
-  });
-}
+
 
 export default function ToggleTable({ selectedStation, selectedRoute, isHoliday }: Props) {
   const [isHolidayLocal, setIsHolidayLocal] = useState<boolean>(isHoliday);
@@ -31,6 +24,10 @@ export default function ToggleTable({ selectedStation, selectedRoute, isHoliday 
   
   const nonRevisitStop = useMemo(
     () => selectedRoute?.stops.find(s => s.name === selectedStation?.name && !s.revisit),
+    [selectedRoute, selectedStation]
+  );
+  const revisitStop = useMemo(
+    () => selectedRoute?.stops.find(s => s.name === selectedStation?.name && s.revisit),
     [selectedRoute, selectedStation]
   );
 
@@ -46,8 +43,8 @@ export default function ToggleTable({ selectedStation, selectedRoute, isHoliday 
     [nonRevisitStop]
   );
   const inboundOffsetMin = useMemo(
-    () => (selectedStation?.durationFromStart ? Math.round(selectedStation.durationFromStart / 60) : 0),
-    [selectedStation]
+    () => (revisitStop?.durationFromStart ? Math.round(revisitStop.durationFromStart / 60) : 0),
+    [revisitStop]
   );
 
   // 파생 스케줄
@@ -57,9 +54,9 @@ export default function ToggleTable({ selectedStation, selectedRoute, isHoliday 
   }, [baseSchedule, selectedStation, nonRevisitStop, outboundOffsetMin]);
 
   const scheduleListInbound = useMemo(() => {
-    if (!selectedStation?.revisit) return null;
+    if (!(selectedStation?.revisit && revisitStop)) return null;
     return addMinutesToTimes(baseSchedule, inboundOffsetMin);
-  }, [baseSchedule, selectedStation, inboundOffsetMin]);
+  }, [baseSchedule, selectedStation, revisitStop, inboundOffsetMin]);
 
   const singleSchedule = useMemo(() => {
     if (selectedStation?.revisit) return null;

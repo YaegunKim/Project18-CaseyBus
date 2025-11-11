@@ -33,6 +33,8 @@ export default function ToggleStation({
   }, []);
 
   const now = React.useMemo(() => new Date(), [tick]);
+
+
   
 
   
@@ -56,8 +58,9 @@ export default function ToggleStation({
         {selectedStation?.revisit?
         routeList.map((route, idx) => {
           const nonRevistStop = route.stops.find(s => s.name === selectedStation.name && !s.revisit);
+          const revistStop = route.stops.find(s => s.name === selectedStation.name && s.revisit);
           const label_first = getNextBusTime(isHoliday ? route.schedule_holidays: route.schedule_weekdays, now, nonRevistStop?.durationFromStart || 0);
-          const label_second = getNextBusTime(isHoliday ? route.schedule_holidays: route.schedule_weekdays, now, selectedStation?.durationFromStart || 0);
+          const label_second = getNextBusTime(isHoliday ? route.schedule_holidays: route.schedule_weekdays, now, revistStop?.durationFromStart || 0);
             return <View key={idx} style={[styles.upcomingBusBlock]}>
               <View key={idx} style={styles.busRow}>
                 <View style={styles.busButtonBox}>

@@ -181,3 +181,15 @@ export function getNextBusTime(schedule:string[], today:Date, durationFromStart:
     }
   }
   return ['No Bus', 'No Bus', 'null'];}
+
+
+
+ export function addMinutesToTimes(times: string[], offsetMin: number): string[] {
+  return times.map((time) => {
+    const [h, m] = time.split(':').map(Number);
+    const total = h * 60 + m + (offsetMin || 0);
+    const hh = ((Math.floor(total / 60) % 24) + 24) % 24; // 음수 방지
+    const mm = ((total % 60) + 60) % 60;
+    return `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
+  });
+}
