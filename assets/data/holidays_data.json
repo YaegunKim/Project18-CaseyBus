@@ -14,6 +14,8 @@
     {"name":"Veterans Day (US) Training Holiday",  "Year":2025,"Month":11,"Date":10, "US":true,"ROK":false,"KATUSA":true,"Notes":"verify"},
     {"name":"Veterans Day 2025",             "Year":2025,"Month":11,"Date":11, "US":true,"ROK":true,"KATUSA":true,"Notes":"verify"},
     {"name":"Korean Employee Union Foundation Day", "Year":2025,"Month":11,"Date":14, "US":false,"ROK":false,"KATUSA":false,"Notes":"verify"},
+    {"name":"Presidential Deputy Commendation Training Holiday (ROK)", "Year":2025,"Month":11,"Date":17, "US":false,"ROK":false,"KATUSA":true,"Notes":"verify"},
+    {"name":"Presidential Deputy Commendation Training Holiday (ROK)", "Year":2025,"Month":11,"Date":21, "US":false,"ROK":false,"KATUSA":true,"Notes":"verify"},
     {"name":"Thanksgiving Day (US)",         "Year":2025,"Month":11,"Date":27, "US":true,"ROK":true,"KATUSA":true,"Notes":"verify"},
     {"name":"Thanksgiving Training Holiday (US)", "Year":2025,"Month":11,"Date":28, "US":true,"ROK":false,"KATUSA":true,"Notes":"verify"},
 
@@ -25,7 +27,7 @@
     {"name":"Dr. Martin Luther King Jr Day Training Holiday (US)", "Year":2026,"Month":1,"Date":16, "US":true,"ROK":false,"KATUSA":true,"Notes":"verify"},
     {"name":"Dr. Martin Luther King Jr Day (US)", "Year":2026,"Month":1,"Date":19, "US":true,"ROK":false,"KATUSA":true,"Notes":"verify"},
 
-    {"name":"Superbowl LX(60) Training Holiday (US)", "Year":2026,"Month":2,"Date":16, "US":true,"ROK":false,"KATUSA":true,"Notes":"verify"},
+    {"name":"Superbowl LX(60) Training Holiday (US)", "Year":2026,"Month":2,"Date":9, "US":true,"ROK":false,"KATUSA":true,"Notes":"verify"},
     {"name":"Washington’s Birthday (US)",     "Year":2026,"Month":2,"Date":16, "US":true,"ROK":false,"KATUSA":true,"Notes":"verify third Monday"},
     {"name":"Lunar New Year (ROK)",           "Year":2026,"Month":2,"Date":16, "US":false,"ROK":true,"KATUSA":true,"Notes":"verify lunar"},
     {"name":"Lunar New Year (US/ROK)",        "Year":2026,"Month":2,"Date":17, "US":true,"ROK":true,"KATUSA":true,"Notes":"verify lunar"},

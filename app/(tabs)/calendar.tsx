@@ -5,19 +5,21 @@ import { Calendar as RNCalendar } from 'react-native-calendars';
 import { Shadow } from 'react-native-shadow-2';
 import holidaysData from '../../assets/data/holidays_data.json';
 
-type MarkedDate = {
-  marked: boolean;
-  dotColor: string;
-  eventName: string;
+type MarkedItem = {
+  customStyles: {
+    container?: any;
+    text?: any;
+  };
+  eventNames: string[];
+  meta: { US: boolean; KATUSA: boolean };
 };
 
-type MarkedDates = {
-  [date: string]: MarkedDate;
-};
+type MarkedDates = Record<string, MarkedItem>;
+
 
 export default function Calendar() {
   const [marked, setMarked] = useState<MarkedDates>({});
-  const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<string[] | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   useEffect(() => {
@@ -27,12 +29,47 @@ export default function Calendar() {
     const start = new Date(year, 0, 1);
     const end = new Date(year+3, 11, 31);
 
-    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-      const key = d.toISOString().split('T')[0];
-      const weekday = d.getDay(); // 0 = Sunday, 6 = Saturday
 
+        holidaysData.holidays.forEach((holiday) => {
+      const { Year, Month, Date, name, US, KATUSA } = holiday;
+      const key = `${Year}-${String(Month).padStart(2, '0')}-${String(Date).padStart(2, '0')}`;
+
+      const prev = marks[key] as MarkedItem | null;
+
+      // 누적 플래그(OR)
+      const us = (prev&&prev.meta? prev.meta.US? true : US : US);
+      const katusa = (prev&&prev.meta? prev.meta.KATUSA? true : KATUSA : KATUSA);
+
+      // 색 계산
+      const bg =
+        us && katusa ? '#f1e2fdff' :
+        us ? '#fdf6ddff' :
+        katusa ? '#d9ecdcff' :
+        'transparent';
+
+      const fg =
+        us && katusa ? '#770095ff' :
+        us ? '#ffc400ff' :
+        katusa ? '#00570cff' :
+        'black';
+
+      marks[key] = {
+        customStyles: {
+          container: { backgroundColor: bg, borderRadius: 5 },
+          text: { color: fg },
+        },
+        eventNames: prev&&prev.eventNames ? [...prev.eventNames, name] : [name],
+        meta: { US: us, KATUSA: katusa },
+      };
+    });
+
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const weekday = d.getDay();
+
+      const prev = marks[key] as MarkedItem | null;
       
-        if (weekday === 1) {
+        if (weekday === 0) {
           // 일요일
           marks[key] = {
             customStyles: {
@@ -42,8 +79,9 @@ export default function Calendar() {
               },
               text: { color: '#c62828' },
             },
+            eventNames: prev&&prev.eventNames ? prev.eventNames : null,
           };
-        } else if (weekday === 0) {
+        } else if (weekday === 6) {
           // 토요일
           marks[key] = {
             customStyles: {
@@ -59,7 +97,10 @@ export default function Calendar() {
     }
 
 
-    const today = new Date().toISOString().split("T")[0];
+    const now = new Date();
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+    const prev = marks[today] as MarkedItem | null;
 
     marks[today] = {
       customStyles: {
@@ -71,42 +112,16 @@ export default function Calendar() {
           shadowOffset: { width: 0, height: 2 },
         },
         text: {
-          color: 'white',               // 흰색 글씨
+          color: 'white',              
           fontWeight: '400',
         },
       },
 
-      eventName: 'Today',
+      eventNames: prev&&prev.eventNames ? [...prev.eventNames, 'Today'] : ['Today'],
     };
 
 
-    holidaysData.holidays.forEach((holiday) => {
-      const { Year, Month, Date, name, US, KATUSA } = holiday;
 
-      const key = `${Year}-${String(Month).padStart(2, '0')}-${String(Date).padStart(2, '0')}`;
-
-    //   marks[key] = {
-    //     marked: true,
-    //     dotColor: "red",
-    //     eventName: name,
-    //   };
-      if(!marks[key]){
-        marks[key] = {
-            customStyles: {
-            container: {
-                backgroundColor: US && KATUSA ? '#f1e2fdff' : US? '#fdf6ddff' : KATUSA? '#d9ecdcff' : 'transparent',
-                borderRadius: 5,
-            },
-            text: {
-                color: US && KATUSA ? '#770095ff' : US? '#ffc400ff' : KATUSA? '#00570cff' : 'black',
-            },
-            },
-            eventName: name,
-        };
-      }else{
-        marks[key] = {...marks[key], eventName: name}
-      }
-    });
 
     
 
@@ -146,7 +161,7 @@ export default function Calendar() {
             });
           setSelectedDate(date);
           if (info) {
-            setSelectedEvent(info.eventName);
+            setSelectedEvent(info.eventNames);
           } else {
             setSelectedEvent(null);
           }
@@ -166,7 +181,11 @@ export default function Calendar() {
           >
           <Text style={styles.eventDate}>{selectedDate}</Text>
           <Text style={styles.eventButton}>EVENT</Text>
-          <Text style={styles.eventText}>{selectedEvent}</Text>
+          <View style={styles.eventText}>
+             {selectedEvent.map((event, idx) => (
+               <Text key={idx} style={styles.eventText}>• {event}</Text>
+             ))}
+          </View>
         
         </Shadow>
         </View>
