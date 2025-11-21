@@ -252,13 +252,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffffff",
   },
   eventDate: {
-    padding: 10,
+    margin: 10,
+    marginLeft: 20,
     fontSize: 20,
-    fontWeight: '500',
+    fontWeight: '700',
   },
   eventButton: {
     fontSize: 12,
-    marginLeft: 10,
+    marginLeft: 20,
     marginBottom: 5,
     width: 50,
     height: 25,
