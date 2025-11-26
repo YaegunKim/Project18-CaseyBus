@@ -1,8 +1,10 @@
+import { useRouter } from 'expo-router';
 import { ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
 
 
 
 export default function Setting() {
+  const router = useRouter();
   return (
     <ScrollView style={styles.container}>
       <TouchableOpacity style={styles.settingBox}>
@@ -14,7 +16,7 @@ export default function Setting() {
       <TouchableOpacity style={styles.settingBox}>
         <Text style={styles.settingText}>Error report</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.settingBox}>
+      <TouchableOpacity style={styles.settingBox} onPress={() => router.push("/setting/aboutus")}>
         <Text style={styles.settingText}>About Us</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.settingBox}>
