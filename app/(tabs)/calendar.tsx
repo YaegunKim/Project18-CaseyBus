@@ -190,6 +190,9 @@ export default function Calendar() {
         </View>
       )}
 
+    <Text style={styles.footer}>
+              © {new Date().getFullYear()} CaseyBus · Built with respect for the Camp Casey community.
+            </Text>
       
     </View>
   );
@@ -298,6 +301,16 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     fontSize: 13,
     marginBottom: 10,
+  },
+
+  footer: {
+    marginLeft: 20,
+    marginRight: 20,
+    marginTop: 10,
+    textAlign: "center",
+    fontSize: 11.5,
+    color: MUTED,
+    opacity: 0.9,
   },
 
 });
