@@ -290,7 +290,7 @@ export default function Facilities() {
           </View>
         </View>
       )}
-<Text style={styles.footer}>
+      <Text style={styles.footer}>
           © {new Date().getFullYear()} CaseyBus · Built with respect for the Camp Casey community.
         </Text>
       </ScrollView>

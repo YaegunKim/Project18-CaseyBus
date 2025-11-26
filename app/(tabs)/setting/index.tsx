@@ -45,7 +45,8 @@ export default function AboutUs() {
           <Text style={styles.body}>
             Developers {"\n"}
             • Military Police Traffic Investigator (KATUSA) {"\n"}
-            • PMO Admin (KATUSA)
+            • PMO Admin (KATUSA) {"\n"}
+            • Military Police (KATUSA)
           </Text>
           <Text style={styles.caption}>
             We keep personal identities low-profile. Please refer to the unit designation above.
