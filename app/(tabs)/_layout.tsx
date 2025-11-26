@@ -38,11 +38,18 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name= "calendar" color={color} />,
         }}/>
       <Tabs.Screen
-        name='facilities'
+        name='facilities/index'
         options={{
           title: 'Facilites',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name= "clock.fill" color={color} />,
         }}/>
+      <Tabs.Screen
+        name="facilities/DFACmenu"
+        options={{
+          title: 'DFACmenu',
+          href: null,
+        }}
+      />
       <Tabs.Screen
         name='setting/index'
         options={{
@@ -52,11 +59,10 @@ export default function TabLayout() {
 
 
       <Tabs.Screen
-        name="setting/aboutus"
+        name="(old)/aboutus"
         options={{
           title: 'AboutUs',
           href: null,
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
         }}
       />
 
@@ -65,7 +71,6 @@ export default function TabLayout() {
         options={{
           title: 'Explore',
           href: null,
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
         }}
       />
       <Tabs.Screen
@@ -73,7 +78,6 @@ export default function TabLayout() {
         options={{
           title: 'Example',
           href: null,
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="dot.fill" color={color} />,
         }}
       />
     </Tabs>

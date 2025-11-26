@@ -1,12 +1,7 @@
 import { FontAwesome6 } from '@expo/vector-icons';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-
-const CARD_BG = "#fff";
-const TEXT = "rgba(56, 56, 56, 1)";
-const MUTED = "#919191ff";
-const LIGHT_BLUE = "#338AE0";
-const LIGHT_GRAY = "#0000002f";
+import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import DFACmenu from './DFACmenu';
 
 export default function Facilities() {
   const [InfoTime_DFAC, setInfoTime_DFAC] = useState<boolean>(false);
@@ -17,58 +12,95 @@ export default function Facilities() {
   const [InfoTime_USO, setInfoTime_USO] = useState<boolean>(false);
   const [InfoTime_Library, setInfoTime_Library] = useState<boolean>(false);
 
+  // 🔹 DFAC 메뉴 모달 on/off
+  const [showDFACMenu, setShowDFACMenu] = useState(false);
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.logoCircle}>
-          <FontAwesome6 name="clock" size={26} style={{ color: '#fff' }} />
-        </View>
-        <Text style={styles.title}>On Base Facilities</Text>
-        <Text style={styles.subtitle}>Essential services and facility hours</Text>
-      </View>
+    <>
+      {/* 🔹 DFAC 메뉴 팝업 모달 */}
+      <Modal
+        visible={showDFACMenu}
+        transparent
+        onRequestClose={() => setShowDFACMenu(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>DFAC Menu</Text>
+              <TouchableOpacity onPress={() => setShowDFACMenu(false)}>
+                <FontAwesome6 name="xmark" size={18} />
+              </TouchableOpacity>
+            </View>
 
-      {/* DFAC */}
-      <TouchableOpacity style={styles.InfoBox} onPress={() => { setInfoTime_DFAC(!InfoTime_DFAC); }}>
-        <FontAwesome6 name="burger" size={32} color="#e53935" style={styles.InfoLogo} />
-        <View style={styles.InfoText}>
-          <Text style={styles.InfoTitle}>DFAC</Text>
-          <Text style={styles.InfoDetail}>Main · Thunder · Argonne · Hovey</Text>
-        </View>
-      </TouchableOpacity>
-      {InfoTime_DFAC && (
-        <View style={styles.InfoDetailBox}>
-          <View style={styles.InfoDetailHeaderRow}>
-            <Text style={[styles.InfoDetailHeader, { flex: 1 }]}>Meal</Text>
-            <Text style={[styles.InfoDetailHeader, { flex: 1, textAlign: 'center' }]}>Weekdays</Text>
-            <Text style={[styles.InfoDetailHeader, { flex: 1, textAlign: 'center' }]}>Holidays</Text>
-          </View>
-
-          <View style={styles.InfoDetailRow}>
-            <Text style={[styles.InfoDetailLabel, { flex: 1 }]}>Breakfast</Text>
-            <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>0730–0900</Text>
-            <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>–</Text>
-          </View>
-
-          <View style={styles.InfoDetailRow}>
-            <Text style={[styles.InfoDetailLabel, { flex: 1 }]}>Lunch</Text>
-            <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>1130–1300</Text>
-            <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>–</Text>
-          </View>
-
-          <View style={styles.InfoDetailRow}>
-            <Text style={[styles.InfoDetailLabel, { flex: 1 }]}>Dinner</Text>
-            <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>1700–1830</Text>
-            <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>1700–1830</Text>
-          </View>
-
-          <View style={styles.InfoDetailRow}>
-            <Text style={[styles.InfoDetailLabel, { flex: 1 }]}>Brunch</Text>
-            <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>–</Text>
-            <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>0930–1300</Text>
+            <ScrollView>
+              <DFACmenu />
+            </ScrollView>
           </View>
         </View>
-      )}
+      </Modal>
+
+      <ScrollView contentContainerStyle={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <View style={styles.logoCircle}>
+            <FontAwesome6 name="clock" size={26} style={{ color: '#fff' }} />
+          </View>
+          <Text style={styles.title}>On Base Facilities</Text>
+          <Text style={styles.subtitle}>Essential services and facility hours</Text>
+        </View>
+
+        {/* DFAC */}
+        <TouchableOpacity
+          style={styles.InfoBox}
+          onPress={() => { setInfoTime_DFAC(!InfoTime_DFAC); }}
+        >
+          <FontAwesome6 name="burger" size={32} color="#e53935" style={styles.InfoLogo} />
+          <View style={styles.InfoText}>
+            <Text style={styles.InfoTitle}>DFAC</Text>
+            <Text style={styles.InfoDetail}>Main · Thunder · Argonne · Hovey</Text>
+          </View>
+          {/* 🔹 메뉴 버튼 → 모달 open */}
+          <TouchableOpacity
+            style={styles.InfoButton}
+            onPress={() => setShowDFACMenu(true)}
+          >
+            <Text style={styles.InfoButtonText}>menu</Text>
+          </TouchableOpacity>
+        </TouchableOpacity>
+
+        {InfoTime_DFAC && (
+          <View style={styles.InfoDetailBox}>
+            <View style={styles.InfoDetailHeaderRow}>
+              <Text style={[styles.InfoDetailHeader, { flex: 1 }]}>Meal</Text>
+              <Text style={[styles.InfoDetailHeader, { flex: 1, textAlign: 'center' }]}>Weekdays</Text>
+              <Text style={[styles.InfoDetailHeader, { flex: 1, textAlign: 'center' }]}>Holidays</Text>
+            </View>
+
+            <View style={styles.InfoDetailRow}>
+              <Text style={[styles.InfoDetailLabel, { flex: 1 }]}>Breakfast</Text>
+              <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>0730–0900</Text>
+              <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>–</Text>
+            </View>
+
+            <View style={styles.InfoDetailRow}>
+              <Text style={[styles.InfoDetailLabel, { flex: 1 }]}>Lunch</Text>
+              <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>1130–1300</Text>
+              <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>–</Text>
+            </View>
+
+            <View style={styles.InfoDetailRow}>
+              <Text style={[styles.InfoDetailLabel, { flex: 1 }]}>Brunch</Text>
+              <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>–</Text>
+              <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>0930–1300</Text>
+            </View>
+
+            <View style={styles.InfoDetailRow}>
+              <Text style={[styles.InfoDetailLabel, { flex: 1 }]}>Dinner</Text>
+              <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>1700–1830</Text>
+              <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>1700–1830</Text>
+            </View>
+          </View>
+        )}
 
       {/* KATUSA Snack Bar */}
       <TouchableOpacity style={styles.InfoBox} onPress={() => { setInfoTime_KSB(!InfoTime_KSB); }}>
@@ -86,19 +118,36 @@ export default function Facilities() {
             <Text style={[styles.InfoDetailHeader, { flex: 1, textAlign: 'center' }]}>Holidays</Text>
           </View>
 
-          {[
-            'Canteen',
-            'Thunder',
-            'Shortie',
-            'Dragon Valley',
-            'Hovey',
-          ].map((name) => (
-            <View key={name} style={styles.InfoDetailRow}>
-              <Text style={[styles.InfoDetailLabel, { flex: 1 }]}>{name}</Text>
-              <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>1100–1900</Text>
+
+          <View style={styles.InfoDetailRow}>
+              <Text style={[styles.InfoDetailLabel, { flex: 1 }]}>Canteen</Text>
+              <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>?</Text>
+              <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>?</Text>
+          </View>
+
+          <View style={styles.InfoDetailRow}>
+              <Text style={[styles.InfoDetailLabel, { flex: 1 }]}>Thunder</Text>
+              <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>?</Text>
+              <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>?</Text>
+          </View>
+
+          <View style={styles.InfoDetailRow}>
+              <Text style={[styles.InfoDetailLabel, { flex: 1 }]}>Shortie</Text>
+              <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>?</Text>
+              <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>?</Text>
+          </View>
+
+          <View style={styles.InfoDetailRow}>
+              <Text style={[styles.InfoDetailLabel, { flex: 1 }]}>Dragon Valley</Text>
+              <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>1000–1920</Text>
               <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>Random</Text>
-            </View>
-          ))}
+          </View>
+
+          <View style={styles.InfoDetailRow}>
+              <Text style={[styles.InfoDetailLabel, { flex: 1 }]}>Hovey</Text>
+              <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>?</Text>
+              <Text style={[styles.InfoDetailText, { flex: 1, textAlign: 'center' }]}>?</Text>
+          </View>
         </View>
       )}
 
@@ -241,9 +290,20 @@ export default function Facilities() {
           </View>
         </View>
       )}
-    </ScrollView>
+<Text style={styles.footer}>
+          © {new Date().getFullYear()} CaseyBus · Built with respect for the Camp Casey community.
+        </Text>
+      </ScrollView>
+    </>
   );
 }
+
+// 아래 styles는 네가 보내준 거에서 modal 쪽만 추가
+const CARD_BG = "#fff";
+const TEXT = "rgba(56, 56, 56, 1)";
+const MUTED = "#919191ff";
+const LIGHT_BLUE = "#338AE0";
+const LIGHT_GRAY = "#0000002f";
 
 const styles = StyleSheet.create({
   container: {
@@ -251,7 +311,6 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingBottom: 30,
   },
-
   header: { alignItems: "center", marginTop: 8, marginBottom: 18 },
   logoCircle: {
     width: 56,
@@ -286,7 +345,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
   },
-
   InfoTitle: {
     fontSize: 18,
     fontWeight: '500',
@@ -329,5 +387,58 @@ const styles = StyleSheet.create({
   InfoDetailText: {
     fontSize: 12,
     color: '#4b4b4bff',
+  },
+
+  InfoButton: {
+    backgroundColor: LIGHT_BLUE,
+    height: 32,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  InfoButtonText: {
+    fontSize: 11,
+    color: '#fff',
+    fontWeight: '500',
+  },
+
+  footer: {
+    marginLeft: 20,
+    marginRight: 20,
+    marginTop: 10,
+    textAlign: "center",
+    fontSize: 11.5,
+    color: MUTED,
+    opacity: 0.9,
+  },
+
+  
+  // 🔹 모달 스타일
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  modalContent: {
+    maxHeight: '70%',
+    width: '90%',
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 24,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  modalTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: TEXT,
   },
 });
