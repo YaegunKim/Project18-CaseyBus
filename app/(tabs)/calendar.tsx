@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Calendar as RNCalendar } from 'react-native-calendars';
 
-import { Shadow } from 'react-native-shadow-2';
+import { FontAwesome6 } from '@expo/vector-icons';
 import holidaysData from '../../assets/data/holidays_data.json';
 
 type MarkedItem = {
@@ -130,7 +130,15 @@ export default function Calendar() {
 
   return (
     <View style={styles.container}>
-      {/* <Text style={styles.title}>Camp Casey Event Calendar</Text> */}
+        {/* Header */}
+        <View style={styles.header}>
+          <View style={styles.logoCircle}>
+            <FontAwesome6 name="calendar" size={26} style={{ color: '#fff' }} />
+          </View>
+          <Text style={styles.title}>USFK Calendar</Text>
+          <Text style={styles.subtitle}>Unified schedule & holiday guide</Text>
+        </View>
+
 
       <View style={styles.colorIndexBox}>
         <View style={styles.colorIndex}>
@@ -148,7 +156,7 @@ export default function Calendar() {
       </View>
       <RNCalendar
 
-        
+        style={styles.calendar}
         markingType="custom"
         markedDates={marked}
         onDayPress={(day) => {
@@ -170,15 +178,8 @@ export default function Calendar() {
       />
 
       {selectedEvent && (
-        
-            
+                   
         <View style={styles.eventBox}>
-        <Shadow
-        style={[styles.eventBox, {marginTop: 5}]}
-        startColor={"#0000000d"}
-          endColor={"#00000000"}
-          distance={25}
-          >
           <Text style={styles.eventDate}>{selectedDate}</Text>
           <Text style={styles.eventButton}>EVENT</Text>
           <View style={styles.eventText}>
@@ -186,8 +187,6 @@ export default function Calendar() {
                <Text key={idx} style={styles.eventText}>• {event}</Text>
              ))}
           </View>
-        
-        </Shadow>
         </View>
       )}
 
@@ -196,17 +195,41 @@ export default function Calendar() {
   );
 }
 
+const CARD_BG = "#fff";
+const TEXT = "rgba(56, 56, 56, 1)";
+const MUTED = "#919191ff";
+const LIGHT_BLUE = "#338AE0";
+const LIGHT_GRAY = "#0000002f";
+
+
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    backgroundColor: '#f5f7f6',
     paddingTop: 50,
-    backgroundColor: '#fff'
+    paddingBottom: 30,
+    flex: 1
   },
-  title: {
-    fontSize: 22,
-    fontWeight: "600",
-    textAlign: "center",
-    marginBottom: 20,
+    header: { alignItems: "center", marginTop: 8, marginBottom: 18 },
+  logoCircle: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: LIGHT_BLUE,
+  },
+  title: { marginTop: 10, fontSize: 20, fontWeight: "700", color: TEXT, letterSpacing: 0.5 },
+  subtitle: { marginTop: 4, fontSize: 12, color: MUTED },
+
+
+
+
+  calendar: {
+    marginHorizontal: 20,
+    borderRadius: 16,
+    paddingBottom: 14,
+    borderWidth: 1,
+    borderColor: LIGHT_GRAY,
   },
 
 
@@ -244,35 +267,37 @@ const styles = StyleSheet.create({
 
 
   eventBox: {
-    width: '100%',
-    height: 500,
-    marginTop: 20,
-    borderTopStartRadius: 20,
-    borderTopEndRadius: 20,
-    backgroundColor: "#ffffffff",
+    marginHorizontal: 20,
+    marginTop: 10,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: LIGHT_GRAY,
+    backgroundColor: CARD_BG,
   },
   eventDate: {
-    margin: 10,
-    marginLeft: 20,
-    fontSize: 20,
-    fontWeight: '700',
+    position: 'absolute',
+    top: 10, right: 15,
+    fontSize: 15,
+    fontWeight: '500',
+    color: TEXT
   },
   eventButton: {
-    fontSize: 12,
+    fontSize: 10,
     marginLeft: 20,
-    marginBottom: 5,
+    marginVertical: 12,
     width: 50,
-    height: 25,
-    backgroundColor: '#0a7342ff',
+    height: 20,
+    backgroundColor: LIGHT_BLUE,
     textAlign: 'center',
-    lineHeight: 25,
+    lineHeight: 20,
     borderRadius: 8,
     color: '#fff',
 
   },
   eventText: {
-    marginLeft: 10,
-    fontSize: 18,
+    marginHorizontal: 10,
+    fontSize: 13,
+    marginBottom: 10,
   },
 
 });

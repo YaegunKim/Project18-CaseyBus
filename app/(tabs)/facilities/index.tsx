@@ -298,7 +298,6 @@ export default function Facilities() {
   );
 }
 
-// 아래 styles는 네가 보내준 거에서 modal 쪽만 추가
 const CARD_BG = "#fff";
 const TEXT = "rgba(56, 56, 56, 1)";
 const MUTED = "#919191ff";
@@ -325,8 +324,7 @@ const styles = StyleSheet.create({
 
   InfoBox: {
     backgroundColor: CARD_BG,
-    marginLeft: 20,
-    marginRight: 20,
+    marginHorizontal: 20,
     height: 120,
     borderRadius: 16,
     padding: 16,
