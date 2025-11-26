@@ -5,7 +5,7 @@ import { ScrollView, StyleSheet } from 'react-native';
 export default function AboutUs() {
   return (
     <ScrollView style={styles.container}>
-
+        
     </ScrollView>
   );
 }
