@@ -7,6 +7,7 @@ export default function AboutUs() {
   const dial = (num: string) => Linking.openURL(`tel:${num}`);
   const router = useRouter();
 
+
   return (
       <ScrollView contentContainerStyle={styles.container}>
         {/* Header */}
@@ -80,6 +81,9 @@ export default function AboutUs() {
         <Text style={styles.footer}>
           © {new Date().getFullYear()} CaseyBus · Built with respect for the Camp Casey community.
         </Text>
+        <TouchableOpacity style={styles.buttonTouchable} onPress={() => router.push('/setting/privacy')}>
+          <Text style={styles.buttonText}>privacy policy</Text>
+        </TouchableOpacity>
       </ScrollView>
 
     
@@ -123,7 +127,16 @@ const styles = StyleSheet.create({
   contactText: { fontSize: 13.5, color: '#fff', fontWeight: "600", letterSpacing: 0.3 },
   footer: {
     marginTop: 10, textAlign: "center", fontSize: 11.5, color: MUTED, opacity: 0.9
+  },
+
+
+  buttonTouchable: {
+    alignItems: "center",
+    marginTop: 12
+  },
+  buttonText: {
+    color: MUTED,
+    fontSize: 11.5,
+    opacity: 0.9,
   }
-
-
 });

@@ -56,6 +56,16 @@ export default function TabLayout() {
           title: 'Setting',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name= "gear" color={color} />,
         }}/>
+      <Tabs.Screen
+        name='setting/privacy'
+        options={{
+          title: 'Privacy',
+          href: null,
+        }}/>
+
+
+
+
 
 
       <Tabs.Screen
